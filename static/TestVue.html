@@ -1,0 +1,1600 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+    <meta charset="utf-8"/>
+    <link rel="shortcut icon" href="https://static.hdslb.com/images/favicon.ico">
+    <title>哔哩哔哩 (゜-゜)つロ 干杯~-bilibili</title>    
+    <link rel="stylesheet" type="text/css" href="testVue.css" />
+    <script src="vue.js" ></script>
+    <script src="SearchCookie.js"></script>
+    <script src="jquery-3.2.1.js" ></script>
+    <script>
+    Vue.component('history-list', {
+  template: '\
+    <li>\
+     <a class="search-link-style" v-bind:href="link" target="_blank"> {{ history.title }} </a>\
+      <div v-if="cancel" class="cancel" v-on:click.stop="$emit(\'remove\')"></div>\
+    </li>\
+  ',
+  props: ['history','link','cancel']
+});
+//vue component for the information of live 
+Vue.component('my-live-tenant',{
+            template:' \
+            <div class="module-live-teant-container">\
+            <a :href="ahreflink" target="_blank">\
+            <div class="module-live-teant-content">\
+            <img :src="contentsrc" />\
+            <div class="module-live-teant-content-info">\
+            <span class="module-fl">{{host}}</span><span class="module-fr">{{number}}</span>\
+            </div>\
+            <div class="module-live-teant-image" :style="{backgroundImage:\'url(\'+imagesrc+\')\'}">\
+            </div>\
+            </div>\
+            <div class="module-live-teant-desc">{{desc}}</div>\
+            <div class="module-live-teant-info">{{info}}</div>\
+            </a>\
+            </div>\
+            \
+            ',
+            props:['imagesrc','contentsrc','host','ahreflink','number','desc','info']
+        })
+Vue.component('my-live-ant',{
+  template:'\
+  <div class="module-live-rank">\
+  <div class="module-live-ranknumber" :class="{\'module-live-top\':num<=3}" >{{num}}</div>\
+  <a :href="livelink"> \
+  <img :src="photosrc" class="module-live-rankimg"></img>\
+  <div class="module-live-rankdesc">\
+  <div class="module-live-rankupdesc">\
+  <span class="module-live-viewcount clearfix">{{viewcount}}</span>\
+  <span class="module-live-name clearfix">{{postname}}</span>\
+  </div>\
+  <div class="module-live-ranklowdesc">{{desc}}</div>\
+  </div>\
+  </a>\
+  </div>',
+  props:['num','livelink','photosrc','viewcount','postname','desc', ]
+});
+//提供预览的子组件
+Vue.component("my-movable",{
+        template:'\
+        <div class="video-container" :class="mycontainer">\
+        <a :href="hreflink" target="_blank" >\
+        <img :src="srclink" />\
+        <div class="movable-pic-container" v-if="show" v-on:mouseover="startMovable($event)" v-on:mousemove="move($event)" v-on:mouseout="hideMovable">\
+        <p v-for="(item,index) in bullets" class="row-bullet" :class="{\'second-row\':isSecondRow(index)}" :style="bulletStyle[index]" ref="p">{{bullets[index]}}</p>\
+        <div class="percent-bar">\
+        <div class="percent" :style="{width:ratio+\'%\'}"></div>\
+        </div>\
+        <div class="movable-pic" :style="[bgposition,backgroundImage]">\
+        </div>\
+        <div class="later-watch">\
+        </div>\
+        <span class="duration">{{duration}}</span>\
+        </div>\
+        <p class="video-description">{{description}}</p>\
+        </a>\
+        </div>\
+        ',
+        props:{
+            parameterObject:{
+                type:Object
+                // default:function(){
+                //     return {
+                //         num: "",
+                //         srclink: 'movablevideo.webp',
+                //         imgsrc: '',
+                //         bulletURL: "",
+                //         hreflink: ""
+                //     }
+                // }
+            },
+            mycontainer:{
+                type:String
+            }
+        },
+        data:function(){
+            return {
+               left:0,
+               top:10,
+               startLeft:0,
+               startTop:0,
+               width:160,
+               height:90,
+               show:this.parameterObject.show,
+               description:this.parameterObject.desc,
+               duration:this.parameterObject.duration,
+               hreflink:this.parameterObject.hreflink,
+               num:this.parameterObject.num,
+              // num:48,
+               numPerRow:10,
+               ratio:0,
+               srclink:this.parameterObject.srclink,
+               //srclink:"movablevideo.webp",
+              // backgroundImgSrc:"movablepic2.webp",
+               backgroundImgSrc:this.parameterObject.imgsrc,
+               bgposition:{
+                backgroundPositionX:"0px",
+                backgroundPositionY:"0px"
+               },
+               showMovablePic:false,
+               timeoutList:[],
+               looptimeout:null,
+               timeInterval:null,
+               bulletStyle:[],
+               bulletURL:this.parameterObject.bulletURL,
+               bullets:['呵呵呵呵','哈哈航昂昂哈','好好学习','秦时明月汉时关','粒粒皆辛苦']
+            }
+        },
+        methods:{
+              startMovable:function(event){
+                this.setNewPosition(event); //根据鼠标的位置，直接定位到对应的背景图片的位置
+                this.showBullet();//弹幕准备发射
+              },
+              move:function(event){
+                this.setNewPosition(event); //这个事件只会触发背景图片位置的切换。
+              },
+              /*根据鼠标的水平位置，设置背景图片的位置，来模拟预览*/
+              setNewPosition:function(event){
+                  var offset=event.offsetX;
+                  this.startTop=event.offsetY;
+                  this.ratio = offset*100.0/this.width;
+                  var sequence = Math.floor(offset*this.num/(this.width+1));
+                  var sequenceV = Math.floor(sequence/this.numPerRow);
+                  var sequenceH = sequence%this.numPerRow;
+                  this.left = 0-sequenceH*this.width;
+                  this.top = 0- sequenceV*this.height;
+                  console.log("sequence is "+sequenceH+" "+sequenceV);
+                  this.bgposition.backgroundPositionX=this.left+"px";
+                  this.bgposition.backgroundPositionY=this.top+"px";
+              },
+              /*弹幕第一行还是第二行*/
+              isSecondRow:function(index){
+                  return index%2!=0;
+              },
+              /**/
+              reloadBullets:function(){
+                 this.timeoutList.forEach(function(timeout){//清除没跑完的setTimeout
+                     clearTimeout(timeout);
+                 });
+                 this.timeoutList=[];                  
+                 this.bulletStyle.splice(0,this.bulletStyle.length); //清除新设定的目标位置
+              },
+              /*将已经设置了bulletstyle的timeout保留，还未执行的timeout取消掉*/
+              hideMovable:function(){
+                  var start = this.bulletStyle.length;   
+                  var end = this.timeoutList.length; 
+                 for(var i = start;i<end; i ++){
+                     clearTimeout(this.timeoutList[i]);
+                 }
+                 this.timeoutList.splice(start,end-start);
+                 clearTimeout(this.looptimeout);
+              },
+              showBullet:function(){
+                var bulletList = this.$refs.p;
+                var that = this;
+                var start = this.bulletStyle.length;
+                if(start==bulletList.length&&start>0){//弹幕已经弹完，需要弄一个循环
+                    this.looptimeout = setTimeout( function(){
+                              that.reloadBullets();
+                              that.showBullet();
+                          },7000);
+                   return;
+                }
+                for(var i = start ; i < bulletList.length; i ++){
+                  this.timeoutList.push(setTimeout(function(index){
+                     return function(){
+                     var length = bulletList[index].clientWidth;
+                     var style={};
+                     style.left="-"+length+"px";
+                     style.transition="all 5s linear";
+                      that.bulletStyle.push(style);
+                      console.log("index is "+index);
+                      if(index==bulletList.length-1){
+                          that.looptimeout=setTimeout(function(){
+                              that.reloadBullets();
+                              that.showBullet();
+                          },7000);
+                      }
+                     };
+                  }(i),(i-start)*1000));
+                }
+              }
+             },
+             computed:{
+                backgroundImage:function(){
+                    return {
+                        background:"url('"+this.backgroundImgSrc+"') 0 0 no-repeat"
+                    };
+                }
+             }
+
+       });
+//子组件的onmouseover onmouseout如果不阻止冒泡，那么对于父组件的onmouseover  onmouseout有啥影响。比如在很多子组件中触发了很多次的onmouseout，但是鼠标在这个过程中一直在父组件的内容里面，那么onmouseout的这个事件会被接收到么？
+    Vue.component('nested-list',{
+        template:'\
+        <li class="horizontal-list"  > \
+            <a class="horizontal-name" :href="list.homelink">\
+            <p class="horizontal-number"> <span class="num">{{list.number>999?"999+":list.number}}</span></p>\
+            <p class="name" >{{list.name}}</p>\
+           </a>\
+            <ul class="vertical-list-container"  >\
+                <li v-for="(item,index) in list.content" class="vertical-list" v-on:mouseover="showMove(location,index)" \
+                v-on:mouseout="backToInitial(location,index)" > \
+                <a class="link-style"  :class="list.tclass[index]" :href="list.link[index]" >\
+                <div class="iconBefore"> </div>\
+                <span>{{item}} \
+                <transition name="fade"> \
+                 <div class="iconAfter" v-show="list.show[index]"></div>\
+                </transition>\
+                </span>\
+                </a>\
+                </li> \
+            </ul>\
+        </li>',
+        props:['list','location','show','show2'],
+        methods:{
+           showList(location){
+             console.log("locations is "+location);
+             this.$emit('showlist',location);
+           },
+           hideList(location){
+            console.log("locations is "+location);
+             this.$emit('hidelist',location);
+           },
+           showListTwo(location){
+            console.log("ul on mouse over");
+            this.$emit('showlist2',location);
+           },
+           hideListTwo(location){
+            console.log("ul on mouse out");
+            this.$emit('hidelist2',location);
+           },
+           showMove:function(loc,secondloc){
+            console.log(" move loc and secloc are"+loc+" "+secondloc);
+            this.$emit('move',loc,secondloc);
+           },
+           backToInitial:function(loc,secondloc){
+            console.log(" back loc and secloc are"+loc+" "+secondloc);
+            this.$emit('back',loc,secondloc);
+           }
+         
+        }
+    })
+    Vue.component('my-slide',{
+        template:'\
+         <transition v-bind:name="tname" mode="out-in">\
+         <a :href="link" v-show="show" class="original-location"> \
+            <img :src="hehe" />\
+            </a>       \
+        </transition>                                       \
+        ',
+        props:['show','hehe','link','tname']
+    });
+
+    Vue.component('recommend-card',{
+        template:'\
+         <div class="recommend-card">\
+            <a :href="link" :title="title" target="_blank" >\
+              <img :src="imgsrc" class="img-card" />\
+              <div class="card-mark">\
+                <p class="title">{{title}}</p>\
+                <p class="author">{{author}}</p>\
+                <p class="viewcount">{{count}}</p>\
+             </div>  \
+            </a> \
+            <div class="later-watch" >\
+                <p class="watch-tip">稍后再看\
+                </p>\
+            </div>\
+        </div>\
+        ',
+        props:['link','title','imgsrc','author','count']
+    });
+
+    //<a href="//www.bilibili.com/v/douga/" class="nav-link"><div class="num-wrap"><span class="num">237</span></div><div class="nav-name">动画</div></a>
+    var list={
+    number:362,
+    homelink:"https://www.bilibili.com/v/douga/",
+    totalshow:false,
+    name:'动画',
+    content:['MAD-AMV','MMD·3D','短片·手书·配音','综合'],
+    link:['douga/mad/','douga/mmd/','douga/voice/','douga/other/'],
+    tclass:[],
+    show:[],
+};
+var list2={
+    number:100,
+    totalshow:false,
+    name:'电影',
+    content:['11','44','55','66','77'],
+    link:['aaa','bbb','eee','fff','ggg'],
+    tclass:[],
+    show:[],
+};
+//<a href="//bangumi.bilibili.com/22/" class="nav-link"><div class="num-wrap"><span class="num">29</span></div><div class="nav-name">番剧</div></a>
+var list3={
+    number:30,
+    homelink:"https://bangumi.bilibili.com/22/",
+    totalshow:false,
+    name:'番剧',
+    content:['连载动画','完结动画','资讯','官方延伸','新番时间表','番剧索引'],
+    link:['anime/serial/','anime/finish/','anime/information/','anime/official/','anime/timeline','anime/index/'],
+    tclass:[],
+    show:[],
+}
+//<a href="//bangumi.bilibili.com/guochuang/" class="nav-link"><div class="num-wrap"><span class="num">15</span></div><div class="nav-name">国创</div></a>
+var list4={
+    number:1111, 
+    homelink:'https://bangumi.bilibili.com/guochuang/',
+    totalshow:false,
+    name:'电影',
+    content:['国产动画','国产原创相关','布袋戏','咨询','新番时间表','国产动画索引'],
+    link:['guochuang/chinese','guochuang/original/','guochuang/puppetry/','guochuang/information/','guochuang/timeline','guochuang/index/'],
+    tclass:[],
+    show:[],
+}
+//<a href="https://www.bilibili.com/v/music/" class="nav-link"><div class="num-wrap"><span class="num">391</span></div><div class="nav-name">音乐</div></a>
+var list5 = {
+    number:222,
+    homelink:"https://www.bilibili.com/v/music/",
+    totalshow:false,
+    name:'音乐',
+    content:['原创音乐','翻唱','VOCALOID·UTAU','演奏','三次元音乐','OP/ED/OST','音乐选集'],
+    link:['music/original/','music/cover/','music/vocaloid/','music/perform/','music/corrdinate/','music/oped/','music/collection/'],
+    tclass:[],
+    show:[],
+}
+//<a href="//www.bilibili.com/v/dance/" class="nav-link"><div class="num-wrap"><span class="num">51</span></div><div class="nav-name">舞蹈</div></a>
+var list6 = {
+    number:333,
+    homelink:'https://www.bilibili.com/v/dance/',
+    totalshow:false,
+    name:'舞蹈',
+    content:['宅舞','三次元舞蹈','舞蹈教程'],
+    link:['dance/otaku/','dance/three_d/','dance/demo/'],
+    tclass:[],
+    show:[],
+}
+//<a href="//www.bilibili.com/v/game/" class="nav-link"><div class="num-wrap"><span class="num">999+</span></div><div class="nav-name">游戏</div></a>
+var list7 = {
+    number:14,
+  homelink:"https://www.bilibili.com/v/game/",
+  totalshow:false,
+  name:'游戏',
+  content:['单机游戏','电子竞技','手机游戏','网络游戏','桌游棋牌','GMV','音游','Mugen'],
+  link:['game/stand_alone/','game/esports/','game/mobile/','game/online/','game/board/','game/gmv/','game/music/','game/mugen/'],
+  tclass:[],
+  show:[]
+}
+var list8 ={
+    number:713,
+    homelink:"https://www.bilibili.com/v/technology/",
+    totalshow:false,
+    name:'科技',
+    content:['趣味科普人文','野生技术协会','演讲·公开课','星海','数码','机械','汽车'],
+    link:['technology/fun/','technology/wild/','technology/speech_course/','technology/military/','technology/digital/','technology/mechanical/','technology/automobile'],
+    tclass:[],
+    show:[]
+}
+
+var list8={
+    number:555555,
+    homelink:'https://www.bilibili.com/v/life/',
+    totalshow:false,
+    name:'生活',
+    content:['搞笑','日常','美食圈','动物圈','手工','绘画','ASMR','运动','其他'],
+    link:['life/funny/','life/daily/','life/food/','life/animal/','life/handmake/','life/painting/','life/asmr/','life/sports/','life/other/'],
+    tclass:[],
+    show:[]
+}
+
+var list9={
+    number:345,
+    homelink:'https://www.bilibili.com/v/kichiku/',
+    totalshow:false,
+    name:'鬼畜',
+    content:['鬼畜调教','音MAD','人力VOCALOID','教程演示'],
+    link:['kichiku/guide/','kichiku/mad/','kichiku/manual_vocaloid/','kichiku/course/'],
+    tclass:[],
+    show:[]
+}
+var list10={
+    number:99999,
+    homelink:'https://www.bilibili.com/v/fashion/',
+    totalshow:false,
+    name:'时尚',
+    content:['美妆','服饰','健身','资讯'],
+    link:['fashion/makeup/','fashion/clothing/','fashion/aerobics/','fashion/information/'],
+    tclass:[],
+    show:[]
+}
+var list11={
+    number:12345,
+    homelink:'https://www.bilibili.com/v/ad/ad',
+    totalshow:false,
+    name:'广告',
+    content:[],
+    link:[],
+    tclass:[],
+    show:[]
+}
+var list12={
+    number:515,
+    homelink:'https://www.bilibili.com/v/ent/',
+    totalshow:false,
+    name:'娱乐',
+    content:['综艺','明星','Korea相关'],
+    link:['ent/variety','ent/start/','ent/korea'],
+    tclass:[],
+    show:[]
+}
+var list13={
+    number:123,
+    homelink:'https://www.bilibili.com/v/cinephile/',
+    totalshow:false,
+    name:'影视',
+    content:['影视杂谈','影视剪辑','短片','预告·资讯','特摄'],
+    link:['cinephile/cinecism/','cinephile/montage','cinephile/shortfilm','cinephile/trailer_info','cinephile/tokusatsu/'],
+    tclass:[],
+    show:[]
+}
+var list14={
+    number:4,
+    homelink:'https://www.bilibili.com/cinema/',
+    totalshow:false,
+    name:'放映厅',
+    content:['纪录片','电影','电视剧'],
+    link:['documentary/','movie/','tv/'],
+    tclass:[],
+    show:[]
+}
+
+
+//<a href="//www.bilibili.com/v/douga/mad/" class="sub-nav-link"><span>MAD·AMV<i class="arrow"></i></span></a>
+var listContainer =[list, list3,list4,list5,list6,list7,list8,list9,list10,list11,list12,list13,list14];
+//var listContainer =[list];
+var data={
+    hehe:listContainer,
+    showarray:[],
+    showarray2:[],
+    giflink:"https://search.bilibili.com/all?keyword=INFINI-T%20FORCE&from_source=gif_recommend&spm_id_from=333.334.primary_menu.108",
+    gifsrc:"animation.gif"
+}
+$(document).ready(function(){
+    var history = new History("history");
+    var gameVue = new Vue({
+           el:"#header",
+           data:{
+            gamepanelshow:false,
+            livepanelshow:false,
+            votepanelshow:false,
+            christmas:"",
+            historyList:[],
+            show:false,
+            hintShow:false,
+            showDelete:true,
+            hideDelete:false,
+            hintList:[{title:'aa'},{title:'aaa'},{title:'b'},{title:'c'},{title:'d'},{title:'e'}],
+            picshow:false,
+            srclink:"",
+            largeGame:{hreflink:"http://game.bilibili.com/fgo/fes/",srclink:"fate2.gif"},
+            middleGameList:[{hreflink:"",srclink:"game.gif",desc:"碧蓝航线"},{hreflink:"",srclink:"game.gif",desc:"寂暗星空"},{hreflink:"",srclink:"game.gif",desc:"修真世界"}],
+            smallGameList:[{hreflink:"",desc:"决战，平安京",srclink:"pkanjk.png"},{hreflink:"",desc:"武装色霸气路飞",srclink:"hjkuke.jpg"},{hreflink:"",desc:"九刀流阿修罗",srclink:"capcom.png"},{hreflink:"",desc:"赤魔疯脚",srclink:"pkanjk.png"},
+            {hreflink:"",desc:"王之蔑视",srclink:"hjkuke.jpg"},{hreflink:"",desc:"大玉螺旋丸",srclink:"pkanjk.png"},{hreflink:"",desc:"重建罗生门",srclink:"capcom.png"}],
+            liveList:[{hreflink:"",srclink:"host1.jpg",host:"梦醒三年梦"},{hreflink:"",srclink:"host2.jpg",host:"今昔是何年"},{hreflink:"",srclink:"host3.jpg",host:"乘风归去"},{hreflink:"",srclink:"host4.jpg",host:"琼楼玉宇"},{hreflink:"",srclink:"host5.jpg",host:"高处不胜寒"},{hreflink:"",srclink:"host6.jpg",host:"何似在人间"}],
+
+          },
+          methods:{
+            showPic:function(index){
+                this.srclink=this.smallGameList[index].srclink;
+                this.picshow=true;
+            },
+            hidePic:function(){
+                this.picshow=false;
+            },
+            showGamePanel:function(){
+             this.gamepanelshow = true;
+            },
+            hideGamePanel:function(){
+             this.gamepanelshow = false;
+            },
+            showLivePanel:function(){
+             this.livepanelshow = true;
+            },
+            hideLivePanel:function(){
+             this.livepanelshow = false;
+            },
+            showuploadpanel:function(){
+            this.votepanelshow = true;
+            },
+            hideuploadpanel:function(){
+            this.votepanelshow = false;
+            },
+            //for search history and hint
+            doSearch:function(){
+                if(this.christmas){
+                    console.log("search keyword is "+this.christmas);
+                    console.log(history);
+                    history.addCookie(this.christmas);
+                    this.historyList = history.getHistoryList();
+                    //parent.location.href="https://search.bilibili.com/all?keyword="+this.christmas;
+                  }
+  
+            },
+            showHistory:function(){
+             if(this.christmas) return;
+              this.historyList =  history.getHistoryList();
+              console.log(this.historyList);
+              if(this.historyList&&this.historyList.length>0){
+                this.show=true;
+              }
+              
+            },
+            hideHistory:function(event){
+                if(event){
+                    console.log(event);
+                }
+                this.show = false;
+            },
+            deleteHistory:function(index){
+                
+                 this.historyList.splice(index,1);
+                 //调用history的删除方法，还没实现
+                },
+            buildLink:function(str){
+                console.log(str);
+                return "//search.bilibili.com/all?keyword="+str;
+            },
+            getHint:function(){
+                if(this.christmas.trim()=="") {
+                    this.hintShow=false;
+                    if(this.historyList&&this.historyList.length>0){
+                        this.show=true;
+                    }
+                    return;
+                };
+                console.log("change triggered");
+                this.show=false;
+                var arrLen = this.hintFileter(this.hintList,this.christmas).length;
+                console.log(arrLen+" length is ");
+                this.hintShow=arrLen>0;
+            },
+            hintFileter:function(arr,key){
+                return arr.filter(function(curVal,index,arr){
+                    return curVal['title'].indexOf(key)!=-1;
+                })
+            }
+          }
+       });
+    var vue = new Vue({
+        el:"#titles",
+        data:data,
+        methods:{
+            showOptionList:function(index){
+                console.log("received index is "+index);
+                if(this.hehe[index].content.length>0){
+                this.showarray.splice(index,1,true);
+                }
+            },
+            hideOptionList:function(index){
+                this.showarray.splice(index,1,false);
+            },
+            showOptionList2:function(index){
+              if(this.hehe[index].content.length>0){
+                  this.showarray2.splice(index,1,true);
+              } 
+            },
+            hideOptionList2:function(index){
+              this.showarray2.splice(index,1,false);
+            },
+            goMove:function(loc,index){
+              console.log("move received value are"+loc+" "+index);
+              var target = this.hehe[loc];
+              target.tclass.splice(index,1,"move-right");
+              console.log(target.tclass[index]+"name");
+              target.show.splice(index,1,true);
+              this.hehe.splice(loc,1,target);//两个都要用splice啊。。我真是服了。
+             
+            },
+            goBack:function(loc,index){
+               console.log("back hehe");
+               var target = this.hehe[loc];
+               target.tclass.splice(index,1,"");
+               target.show.splice(index,1,false);
+               this.hehe.splice(loc,1,target);
+            }
+        }
+    });
+    var slideVue = new Vue({
+        el:"#slide",
+        data:{
+            showlist:[true],
+            content:["bilibili_slide4.jpg","bilibili_slide5.jpg","bilibili_slide3.jpg","bilibili_slide1.jpg","bilibili_slide2.jpg"],
+            timer:null,
+            morelink:'https://www.bilibili.com/blackboard/topic_list.html?spm_id_from=333.334.chief_recommend.2',
+            titles:['2017,生活区陪你一起走过','一定还会再见面','全明星阵容','♪(^∇^*)','周末来啦~'],
+            links:['https://www.bilibili.com/read/cv129822/','https://show.bilibili.com/platform/home.html?cityid=310100','https://show.bilibili.com/platform/detail.html?id=11257&from=sj_cpmdy_d','https://www.bilibili.com/blackboard/activity-ryJJHYwGM.html?spm_id_from=333.334.chief_recommend.7','https://www.bilibili.com/blackboard/topic/activity-HJiAYs1Xz.html?spm_id_from=333.334.chief_recommend.9'],
+            title:'2017,生活区陪你一起走过',
+            link:"https://www.bilibili.com/read/cv129822/",
+            start:0,
+            transitionname:'imgslide-fade',
+            switchback:false,
+            tips:[{tip:'一周',ind:'0'},{tip:'三日',ind:'1'},{tip:'昨日',ind:'2'}],
+            recommendInfo:null,
+            recomendList:[[{link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend1.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend1.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend1.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend1.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend1.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend1.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend1.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend1.jpg',author:'up主:呵呵杭二',count:'1.7万'}],[{link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend2.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend2.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend2.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend2.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend2.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend2.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend2.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend2.jpg',author:'up主:呵呵杭二',count:'1.7万'}],[{link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend3.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend3.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend3.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend3.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend3.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend3.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend3.jpg',author:'up主:呵呵杭二',count:'1.7万'},
+                           {link:'https://www.bilibili.com/video/av17650330/',title:'【新番推荐】史上最强 神话降临 1月新番开播前大分析',imgsrc:'bilibili_recommend3.jpg',author:'up主:呵呵杭二',count:'1.7万'}]]
+        },
+        created:function(){//如果不做初始化的话，直接点击后面的按钮会出现问题。
+         for(var i = 0 ; i < this.content.length-1; i ++){
+             this.showlist.push(false);
+         }
+         this.recommendInfo = this.recomendList[0];
+        },
+        methods:{
+         loop:function(){
+             var length = this.content.length;
+             var that = this;
+             if(length<1) return;
+             this.timer = setInterval(function(){
+                if(that.switchback){
+                    that.switchTransMode(true);
+                }
+                that.start = that.start%length;
+                if(that.start==length-1){
+                 that.showlist.splice(that.start,1,false);
+                 that.showlist.splice(0,1,true);
+                }
+                else{
+                that.showlist.splice(that.start,2,false,true);
+                }
+                that.start = (that.start+1)%length;
+                that.title=that.titles[that.start];
+                that.link=that.links[that.start];
+             },4000);
+         },
+         switchPic:function(index){
+              console.log("received index of trigger"+index);
+              clearInterval(this.timer);
+              if(index<this.start){
+                  this.switchTransMode(false);
+              }
+              else{
+                this.switchTransMode(true);
+              }
+              this.showlist.splice(this.start,1,false);
+              this.showlist.splice(index,1,true);
+              this.title=this.titles[index];
+              this.link=this.links[index];
+              this.start=index;
+              console.log("transition name"+this.transitionname);
+              this.loop();
+         },
+         switchTransMode:function(left){
+              if(left){
+                  this.transitionname="imgslide-fade";
+                  this.switchback=false;
+              }
+              else{
+                this.switchback=true;
+                this.transitionname="imgslide-fade-right"
+              }
+         },
+         stopLoop:function(){
+             clearInterval(this.timer);
+         },
+         continueLoop:function(){
+             this.loop();
+         },
+         preview:function(){
+             this.tips.push(this.tips.shift());
+             var index = this.tips[0].ind;
+             this.recommendInfo=this.recomendList[index];
+         },
+         nextview:function(){
+             this.tips.unshift(this.tips.pop());
+             var index = this.tips[0].ind;
+             this.recommendInfo=this.recomendList[index];
+         }
+        }
+    })
+    slideVue.loop();
+
+    var previewVue = new Vue({
+        el:"#movable-pic",
+        data:{
+         videoList:[{num:100,srclink:'movablevideo.webp',imgsrc:'movablepic3.webp',bulletURL:'',hreflink:'',desc:'美丽的男孩子，请问你有女朋友么',duration:'1:23',show:true},
+        {num:30,srclink:'movablevideo2.webp',imgsrc:'movablepic4.webp',bulletURL:'',hreflink:'',desc:'我想明天给你买个包。。。子',duration:'5:27',show:true},
+         {num:48,srclink:'movablevideo3.webp',imgsrc:'movablepic2.webp',bulletURL:'',hreflink:'',desc:'有趣的灵魂万中无一，但是你更漂亮',duration:'11:11',show:true},
+        {num:40,srclink:'movablevideo4.webp',imgsrc:'movablepic.webp',bulletURL:'',hreflink:'',desc:'吾生也有涯，而知也无涯',duration:'5:20',show:true},
+        {num:40,srclink:'movablevideo2.webp',imgsrc:'movablepic.webp',bulletURL:'',hreflink:'',desc:'出师未捷身先死，长使英雄泪满襟',duration:'5:20',show:true}],
+        advocateContainer:'advocate-container'
+        }
+    });
+    /*script for side nav bar*/
+    function switchElement(source,target){
+        console.log("received index are "+source+" "+target);
+        var sourceid="#"+idlist[source];
+        var targetid= "#"+idlist[target];
+        if(source<target){
+        $(sourceid).insertAfter(targetid);
+        }
+        else if(source>target){
+        $(sourceid).insertBefore(targetid);
+        }
+        else{
+            return;
+        }
+
+        var idtmp = idlist[source];
+        idlist.splice(source, 1);
+        idlist.splice(target, 0, idtmp);
+
+        var sizetmp = sizelist[source];
+        sizelist.splice(source, 1);
+        sizelist.splice(target, 0, sizetmp);
+       
+    }
+
+    window.onscroll=function(e){
+        var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+        var availableHeight = document.documentElement.clientHeight ;
+         vueNav.adjustTop(availableHeight,scrollTop);
+         vueNav.changeSelecte(scrollTop);
+         console.log("scrollTop is "+scrollTop);
+    }
+    var sizelist = [300,400,500,400,300,500,700,200,400,600,300,500,200,700,400,500,300];
+    var idlist=['module-game','module-national','module-series','module-live','module-dance','module-life','module-fashion','module-demon','module-animation','module-film','module-entertain','module-ft','module-tv','module-doc','module-music','module-science','module-adv']
+    var vueNav = new Vue({
+        el:"#movable-nav",
+        data:{
+           
+           height:32,
+           width:40,
+           show:false,
+           top:0,
+           content:"呵呵",
+           totalHeight:280,
+           zindex:-1,
+           mousedownpoint:0,
+           starttop:0,
+           topNav:241,
+           isSelected:[],
+           aftermousedown:false,
+           editable:false,
+           timer:null,
+           bgx:0,
+           startindex:0,
+           targetindex:0,
+           navHeight:730,
+           navIndex:1,
+           heightBeforeNav:710,
+           tipshow:false,
+           items:['游戏','国创','番剧','直播','舞蹈','生活','时尚','鬼畜','动画','电影','娱乐','影视','TV剧','纪录片','音乐','科技','广告'],
+           highItems:sizelist
+        },
+        created:function(){
+           this.totalHeight = this.height * this.items.length;
+           console.log("total height is "+this.totalHeight);
+           for(var i = 0 ; i < this.items.length; i ++){
+               this.isSelected.push(false);
+           }
+        },
+        methods:{
+            handlemousedown:function(event,index){
+             if(this.editable){//hehe只有可编辑状态下才需要后续的记录
+             this.showhiddenblock(event,index);
+             this.zindex = 996;
+             this.content = this.items[index];
+             this.aftermousedown = true;
+             }
+            },
+            handlemouseup:function(event,index){
+            },
+            showhiddenblock:function(event,index){
+             this.top = index*this.height;
+             this.show = true;
+             this.mousedownpoint = this.top+event.offsetY;
+             this.starttop = this.top;
+             this.startindex = index;
+            },
+            handlemaskdown:function(event){
+    
+            },
+            handlemaskmove:function(event){
+             if(!this.aftermousedown) return;
+             var offy = event.offsetY;
+             this.top = this.top+(offy-this.mousedownpoint);
+             this.mousedownpoint = offy;
+             var direction = this.top > this.starttop;//hehe应该用最终结果的偏移来决定方向，而不是用两次move的偏移来决定方向，因为我先下10 再上5 大体还是往下，但是只看这两次的话，方向是向上的。
+             var index = Math.floor(this.top/this.height);
+             //console.log(direction);
+             var move = direction? this.top - this.starttop : this.starttop - this.top;//hehe如果是往上移动，那么偏移应该是指相比于上一个格子的底部，而不是顶部
+             if((direction&&index==this.items.lenght-1))
+             return;
+             if(move>=(this.height/2 + 5)){
+                if(direction){
+                    var current = this.items[index];
+                    var next = this.items[index+1];
+                   //this.items.splice(index,2,next,current);
+                    this.items.splice(index,1,next);
+                    this.items.splice(index+1,1,current);
+                    this.starttop = this.starttop+this.height;//hehe换了位置以后要更新新的起点位置.
+                   // console.log("change from "+(index+1)+" to "+index);
+                }
+                else{
+                    var current = this.items[index]; //hehe这里求得的index应该是上一个的index，因为top移动到了目标头上
+                    var next = this.items[index+1];
+                  //  this.items.splice(index,2,next,current);
+                    this.items.splice(index,1,next);
+                    this.items.splice(index+1,1,current);
+                    this.starttop = this.starttop - this.height;
+                   // console.log("change from "+(index)+" to "+(index+1));
+                }
+               //console.log("index "+index+" direction "+direction+" move "+move+" top "+this.top);
+             }
+            },
+            handlemaskup:function(event){
+             this.mouseoffmask();
+            },
+            handlemaskout:function(event){
+             if(this.aftermousedown){ //如果不是按住了鼠标，则不考虑移出的问题。
+             this.mouseoffmask();
+             }
+            },
+            mouseoffmask:function(){
+             this.aftermousedown = false;
+             this.show = false;
+             this.zindex = -1;
+             this.targetindex = Math.floor(this.starttop/this.height);
+             switchElement(this.startindex,this.targetindex);
+            },
+            notselect:function(){
+                return false;
+            },
+            changeSelecte:function(position){
+               // console.log("received top is "+position);
+               if(this.editable) return;//
+                position = position - this.heightBeforeNav + 50;//50 valve value
+                var total = 0;
+                this.isSelected=[];
+              for(var i = 0 ; i < this.highItems.length; i ++){
+                var current = this.highItems[i];
+                if(total<=position&&current+total>position){
+                    this.isSelected.push(true);
+                }
+                else{
+                    this.isSelected.push(false);
+                }
+                // console.log("total is "+total);
+                // console.log("current is "+current);
+                total = total + current;
+              }
+              console.log(this.isSelected);
+            },
+            scrollTarget:function(index){
+                if(this.editable) return;
+                var target = this.heightBeforeNav ;
+                for(var i = 0 ; i < index ; i ++){
+                    target+=this.highItems[i];
+                }
+                window.scrollTo(0,target);
+            },
+            setEditable:function(){
+                this.editable = !this.editable;
+                for(var i = 0 ; i < this.isSelected.length; i ++){
+                    if(this.isSelected[i]==true){
+                        this.isSelected.splice(i,1,false);
+                    }
+                }
+            },
+            srollToTop:function(){
+                window.scrollTo(0,0);
+            },
+            standby:function(){
+             clearInterval(this.timer);
+             var count = 0 ;
+             var that = this;
+             this.tipshow = true;
+             this.timer=setInterval(function(){
+                that.bgx = 0- count*80;
+                count++;
+                if(count>=16){
+                    count= count -6;
+                }
+             },90);
+            },
+            backtosleep:function(){
+            clearInterval(this.timer);
+            this.tipshow = false;
+            var that = this;
+            this.timer = setInterval(function(){
+              that.bgx=that.bgx+80;
+              if(that.bgx>=0){
+                  clearInterval(that.timer);
+                 that.bgx = 0;
+              }
+            },90);
+            },
+            adjustTop:function(height,scrollTop){
+                console.log("height is "+height);
+                if(scrollTop==0){
+                    this.topNav="240";
+                    return;
+                }
+                else if(scrollTop<=170){
+                    return;
+                }
+              if(height<=this.navHeight){
+                  this.topNav = 0;
+              }
+              else{
+                  this.topNav = Math.floor((height-this.navHeight)/2);
+              }
+            }
+
+        }
+    });
+    var liveVue = new Vue({
+        el:"#module-live",
+        data:{
+            livenumber:10000,
+            updatesnum:12345,
+            biglivelists:[{imagesrc:'hahaha.jpg',contentsrc:'bilibili_recommend3.jpg',host:'葡萄美酒夜光杯',ahreflink:'http',number:'3333',desc:'不知明镜里，何处得秋霜。',info:'战争·出战'},{imagesrc:'bilibili_recommend2.jpg',contentsrc:'movablevideo4.webp',host:'葡萄美酒夜光杯',ahreflink:'http',number:'3333',desc:'欲渡黄河冰塞川，将登太行雪满山',info:'战争·出战'},
+            {imagesrc:'bili_live1.jpg',contentsrc:'bilibili_recommend2.jpg',host:'黑云压城城欲摧',ahreflink:'http',number:'3333',desc:'王师北定中原日',info:'战争·出战'},{imagesrc:'bilibili_recommend2.jpg',contentsrc:'bilibili_recommend3.jpg',host:'琵琶一曲断',ahreflink:'http',number:'3333',desc:'闲来垂钓碧溪上，忽复乘舟梦日边',info:'战争·出战'},{imagesrc:'bilibili_recommend3.jpg',contentsrc:'movablevideo3.webp',host:'不眠是征人',ahreflink:'http',number:'3333',desc:'黄沙百战穿金甲，不破楼兰终不还。',info:'战争·出战'},
+            {imagesrc:'bili_live2.jpg',contentsrc:'bili_live3.jpg',host:'天下谁人不识君',ahreflink:'http',number:'3333',desc:'卷我屋上三重茅，茅飞渡江洒江郊，高者挂罥长林梢，下者飘转沉塘坳',info:'战争·出战'},{imagesrc:'bilibili_recommend1.jpg',contentsrc:'movablevideo2.webp',host:'夜光杯独醒',ahreflink:'http',number:'3333',desc:'羌笛何须怨杨柳，春风不度玉门关',info:'战争·出战'},
+            {imagesrc:'bili_live3.jpg',contentsrc:'bili_live6.jpg',host:'鹅鹅鹅',ahreflink:'http',number:'3333',desc:'上下而求索',info:'战争·出战'},
+            {imagesrc:'bili_live4.jpg',contentsrc:'bili_live1.jpg',host:'关关雎鸠',ahreflink:'http',number:'3333',desc:'上穷碧落下黄泉。',info:'战争·出战'},
+            {imagesrc:'bili_live6.jpg',contentsrc:'bili_live4.jpg',host:'君子好逑',ahreflink:'http',number:'3333',desc:'溯洄从之，道阻且长',info:'战争·出战'}],
+            left:0,
+            width:260,
+            isselected:[],
+            carousel:[],
+            cleft:0,
+            carouselInterval:null,
+            leftArray:[0,-260,-520],
+            carouselArray:[{src:'bili_recommendation.webp',link:'http'},{src:'bili_recommendation2.webp',link:'http'},{src:'bili_recommendation3.webp',link:'http'},{src:'bili_recommendation2.webp',link:'http'}],
+           // carouselArray:[{src:'bili_recommendation.webp',link:'http'},{src:'bili_recommendation2.webp',link:'http'}],
+            indexArray:[0,1,2],
+            descArray:['今日与君别','雪上空留马行处','Legend never die','今日无人试此刀'],
+            //descArray:['今日与君别','雪上空留马行处'],
+            desc:"",
+            margin:'1%',
+            widthArray:['50%','25%','25%'],
+            smalllivelist:[{num:1,livelink:"http",photosrc:"host3.jpg",viewcount:"23W",postname:'一日不见三秋隔',desc:'三秋不见已忘君'},
+            {num:2,livelink:"http",photosrc:"host2.jpg",viewcount:"6.0W",postname:'君住长江头',desc:'妾在长江尾'},
+            {num:3,livelink:"http",photosrc:"host4.jpg",viewcount:"5.3W",postname:'思君不见君',desc:'你就去死吧'},
+            {num:4,livelink:"http",photosrc:"host5.jpg",viewcount:"4.1W",postname:'接天莲叶无穷碧',desc:'映日荷花别样红'},
+            {num:5,livelink:"http",photosrc:"host1.jpg",viewcount:"2.3W",postname:'天时地利人和',desc:'枝繁叶茂根深'},
+            {num:6,livelink:"http",photosrc:"host6.jpg",viewcount:"1.5W",postname:'那一瞥',desc:'那一剑的温柔'}]
+        },
+        created:function(){
+           this.initializeData();
+           this.getUpdateLoop();
+        },
+        methods:{
+           initializeData:function(){
+           this.isselected=[true];
+           this.carousel=[true];
+           this.indexArray=[0];
+           this.leftArray=[0];
+           var part = this.descArray.length;
+           var marginParts = 2*part;
+           var specialPercent = 90*2/(part+1)+"%";
+           var percent = 90*1/(part+1)+"%";
+           this.margin = 10/marginParts+"%";
+           this.widthArray=[specialPercent];
+           this.desc = this.descArray[0];
+           for(var i = 1 ; i < part; i ++){
+            this.isselected.push(false);
+            this.carousel.push(false);
+            this.indexArray.push(i);
+            this.leftArray.push(-1*i*this.width);
+            this.widthArray.push(percent);
+           }
+            },
+            switchTab:function(index){
+                var target = parseInt(index);
+                this.left = (-1)*target*this.width;
+                this.isselected=[false,false,false];
+                this.isselected.splice(target,1,true);
+                console.log(this.isselected);
+                if(this.carouselInterval){
+                    clearInterval(this.carouselInterval);
+                }
+                if(target==2){
+                   this.setSlideLoop();
+                }
+            },
+
+            handlemouseovercarousel:function(index){ 
+                clearInterval(this.carouselInterval);
+                var target = parseInt(index);
+                this.initializeData(); //default value is index 0 has special value. in this case, need to handle the target correctly as index 0 should be set to normal value.
+                this.cleft=this.leftArray[target];
+                this.desc = this.descArray[target];
+                var specialPercent = this.widthArray[0];
+                this.widthArray.shift();
+                this.widthArray.splice(target,0,specialPercent);
+                var value=this.carousel.shift();
+                this.carousel.splice(target,0,value); //
+                for(var i=0; i < index ; i ++){
+                    this.indexArray.push(this.indexArray.shift());
+                }
+            },
+            handlemouseoutcarousel:function(index){
+                this.setSlideLoop(); 
+            },
+            //think about the mouseon and mouseout, how to set the start page of the interval.
+            setSlideLoop:function(){
+                var that = this;
+                    this.carouselInterval= setInterval(function(){
+                    that.carousel.unshift(that.carousel.pop());
+                    that.widthArray.unshift(that.widthArray.pop());
+                    that.indexArray.push(that.indexArray.shift());
+                    var loc = that.indexArray[0];//use the index array to simulate the move of the page, 0 means the current location of the left and desc.
+                    that.cleft=that.leftArray[loc]; 
+                    that.desc = that.descArray[loc];
+                    },3000);
+            },
+            stopSlideLoop:function(){
+                clearInterval(this.carouselInterval);
+            },
+            resetUpdates:function(){
+                this.updatesnum = 0;
+                this.biglivelists.unshift(this.biglivelists.pop());
+            },
+            getUpdateLoop:function(){
+                var that = this;
+                setInterval(function(){
+                 that.updatesnum = that.updatesnum + Math.ceil(Math.random()*50);
+                },7000);
+            }
+
+        }
+    })
+});
+
+    </script>
+   </head>
+     <body>
+      <div id="header" >
+       <div class="backgroundimg">
+         <div class="mask">
+         </div>
+         <div class="bili-wrapper clearfix ">
+            <div class="left-header">
+               <ul>
+                <li class="left-header-item home">
+                   
+                    <a href="htt" class="left-header-link" target="_blank" title="" >
+                        <i class="bili-icon homeicon "></i>
+                        主站</a></li>
+                <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" >画友</a></li>
+                <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" v-on:mouseover.capture="showGamePanel" v-on:mouseout.capture="hideGamePanel">游戏中心</a>
+                    <transition name="game-panel">
+                    <div  class="game-panel" v-if="gamepanelshow" v-on:mouseover="showGamePanel" v-on:mouseout="hideGamePanel" >
+                       
+                        <div class="left-game-panel " >
+                             <a :href="largeGame.hreflink" class="leftup-game-panel" target="_blank" >
+                                 <img :src="largeGame.srclink" />
+                             </a>
+                             <ul class="small-game-list">
+                                 <li  class="small-game-item" v-for="(item,index) in middleGameList" v-bind:key="index" >
+                                     <a :href="item.hreflink" class="small-game-link">
+                                         <img :src="item.srclink" />
+                                         <p class="game-desc">{{item.desc}}</p>
+                                     </a>     
+                                 </li>
+                             </ul>
+                        </div>
+                        <div class="right-game-panel">
+                           <div class="rightup-game-panel">
+                              <img src="foreshow.gif" class="rightup-game-img" />
+                              <a href="" target="_blank" class="forum-link">
+                                  游戏论坛
+                              </a>
+                           </div>
+                           <ul class="rightup-game-list">
+                               <li  v-for="(item,index) in smallGameList" v-bind:key="index" class="rightup-game-item" v-on:mouseover="showPic(index)" v-on:mouseout="hidePic">
+                                   <a :href="item.hreflink" class="rightup-game-link">
+                                      <span>{{item.desc}}</span>
+                                   </a>
+                               </li>
+                           </ul>
+                        </div>
+                        <div class="rightup-pic" v-show="picshow">
+                          <img :src="srclink" />
+                        </div>
+                    </div> 
+                    </transition>
+                </li>
+                <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" v-on:mouseover="showLivePanel" v-on:mouseout="hideLivePanel">直播</a>
+                <transition name="game-panel">
+                <div class="header-live-panel" v-if="livepanelshow" v-on:mouseover="showLivePanel" v-on:mouseout="hideLivePanel">
+                    <div class="header-live-lf">
+                       <p class="live-title">热门直播:</p>
+                       <div class="hot-live" >
+                          <a  class="hot-live-item" v-for="(item,index) in liveList" v-bind:key="index" :href="item.hreflink">
+                                <img :src="item.srclink" />
+                                <i>LIVE</i>
+                                <span>{{item.host}}</span>
+                          </a>
+    
+                         </div>
+                    </div>
+                    <div class="header-live-rf">
+                       <p class="live-title title2">热门活动:</p>
+                       <div class="header-live-activity">
+                           <a href="" target="_blank" title="" >
+                               <img src="bilibili_activity4.jpg" />
+                           </a>
+                       </div>
+                    </div>
+                  </div></transition></li>
+                <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" >会员购</a></li>
+                <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" >周边</a></li>
+                <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" >移动端</a></li>
+               </ul>
+            </div>
+            <div class="right-header-upload" v-on:mouseover.capture="showuploadpanel" v-on:mouseout.capture="hideuploadpanel">
+               <a href="http:upload" target="_blank" class="upload-link">
+                   投稿
+               </a> 
+               <transition name="game-panel">
+               <ul class="upload-item" v-show="votepanelshow">
+                    <li>
+                      <a href="" target="_blank" >
+                          <i class="bili-icon rect art"></i>
+                          <span>专栏投稿</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="" target="_blank" >
+                          <i class="bili-icon rect audio"></i>
+                          <span>音频投稿</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="" target="_blank" >
+                          <i class="bili-icon rect video"></i>
+                          <span>视频投稿</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="" target="_blank" >
+                          <i class="bili-icon rect vote"></i>
+                          <span>投稿管理</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="" target="_blank" >
+                          <i class="bili-icon rect creation"></i>
+                          <span>创作中心</span>
+                      </a>
+                    </li>
+                 </ul>
+                </transition>
+            </div>
+            <div class="user-menu">
+                <div class="user-menu-first"><a href="http" target="_blank"  ><img class="user-pic" src="user.jpg" /></a></div>
+                <div class="left-header-item"><a href="http" target="_blank" class="left-header-link" >历史</a></div>
+            </div>
+         </div>
+       </div>
+       <div class="backimglink">
+           <div class="bili-wrapper head-content">
+                <a href="//www.bilibili.com" class="head-logo" ></a> 
+                <div class="search">
+                        <a href="//www.bilibili.com/ranking?spm_id_from=333.334.banner_link.1" target="_blank" class="link-ranking"><span>排行榜</span></a>
+                       <div class="searchPanel"> <input v-on:click.stop="" v-on:focus.stop="showHistory"  v-on:input="getHint" id="searchKeyword" autocomplete="off" v-model="christmas" type="text" placeholder="老铁，往门里踢啊" class="searchInput" /><button  v-on:click="doSearch" class="submitButton"></button>
+                        <ul v-if="show" class="showstatus">
+                            <li class="list-tip" ><div class="base-line">
+                            <span class="history-tip">
+                            历史记录
+                            </span>
+                            </div></li>
+                            <transition-group name="list" tag="li">
+                            <li class="list-item" is="history-list" v-for="(item,index) in historyList" v-bind:history="item" v-bind:key="item.title"  v-bind:link="buildLink(item.title)" v-bind:cancel="showDelete" v-on:remove="deleteHistory(index)"></li>
+                        </transition-group>    
+                        </ul> 
+                            <ul v-if="hintShow" class="showstatus">
+                                <li class="list-tip" ><div class="base-line">
+                                <span class="history-tip">
+                                关键词
+                                </span>
+                                </div></li>
+                                <li class="list-item" is="history-list" v-for="(item,index) in hintFileter(hintList,christmas)" v-bind:history="item" v-bind:link="buildLink(item.title)" v-bind:cancel="hideDelete" v-on:remove="deleteHistory(index)"></li>
+                                </ul> 
+                        </div>
+                </div>
+           </div> 
+       </div>
+      </div>
+      <div id="titles" class="bili-wrapper">
+        <ul class="horizontal-list-container">
+         <li class="horizontal-list">
+             <a href="https" target="_blank" class="homelink">
+                 <i class="home-icon"></i>
+                 <span>首页</span>
+             </a>
+         </li>
+         <li class="horizontal-list" is="nested-list" v-for="(item,index) in hehe" v-bind:key="index" v-bind:list="item" v-bind:location="index"
+         v-bind:show="showarray[index]" v-bind:show2="showarray2[index]"
+         v-on:showlist="showOptionList" v-on:showlist2="showOptionList2" v-on:hidelist="hideOptionList" v-on:hidelist2="hideOptionList2" v-on:move="goMove" v-on:back="goBack" > <!--这里不用加参数-->
+
+         </li>
+         <li class="horizontal-list side-nav" >
+            <a href="https://www.bilibili.com/read/home" class="side-link">
+                <i class="s-column"></i>
+                    <span>专栏</span>
+            </a>
+         </li>
+         <li class="horizontal-list side-nav">
+                <a href="https://www.bilibili.com/square" class="side-link">
+                    <i class="square"></i><span>广场</span></a>
+                <div class="square-content">
+                    <ul class="left-square">
+                      <li class="left-square-item">
+                        <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                        <i class="left-icon icon-vip"></i><span>会员购</span>
+                        </a>
+                      </li>
+                    <li class="left-square-item">
+                        <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                        <i class="left-icon icon-activity"></i><span>活动中心</span>
+                        </a>
+                    </li>
+                    <li class="left-square-item">
+                        <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                        <i class="left-icon icon-game"></i><span>游戏中心</span>
+                        </a>
+                    </li>
+                    <li class="left-square-item">
+                            <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                                <i class="left-icon icon-news"></i><span>新闻中心</span>
+                            </a>
+                    </li>
+                    <li class="left-square-item">
+                            <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                                <i class="left-icon icon-painter"></i><span>画友</span>
+                            </a>
+                    </li>
+                    <li class="left-square-item">
+                            <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                                <i class="left-icon icon-tv"></i><span>芒果TV</span>
+                            </a>
+                    </li>
+                    </ul>
+                    <div class="right-square">
+                         <div class="right-square-item">
+                                <a href="https://www.bilibili.com/blackboard/activity_list.html?spm_id_from=333.334.primary_menu.93" 
+                                target="_blank" title="bilibili 活动">
+                                <div class="lazy-img">
+                                    <img alt="" src="bilibili_activity.jpg">
+                                </div>
+                                </a>
+                 
+                         </div>
+                         <div class="right-square-item">
+                                <a href="https://www.bilibili.com/blackboard/topic_list.html" target="_blank" title="话题列表">
+                                    <div class="lazy-img">
+                                    <img alt="" src="bilibili_topic.jpg" />
+                                    </div>
+                                </a>
+                         </div>
+                    </div>
+                </div>
+         </li>
+         <li class="horizontal-list side-nav">
+                <a href="https://live.bilibili.com" class="side-link">
+                    <i class="live"></i><span>直播</span></a>
+                <div class="live-panel">
+                    <ul class="live-panel-left">
+                        <li class="live-panel-leftitem">
+                            <a href="https://live.bilibili.com/subject" class="live-panel-leftlink">
+                             <i class="leftArrow"></i>
+                             <span>推荐主播<i class="rightArrow"></i></span>
+                            </a>
+                        </li>
+                        <li class="live-panel-leftitem">
+                                <a href="https://live.bilibili.com/pages/area/ent" class="live-panel-leftlink">
+                                 <i class="leftArrow"></i>
+                                 <span>生活娱乐<i class="rightArrow"></i></span>
+                                </a>
+                            </li>
+                        <li class="live-panel-leftitem">
+                            <a href="https://live.bilibili.com/draw" class="live-panel-leftlink">
+                             <i class="leftArrow"></i>
+                            <span>绘画专区<i class="rightArrow"></i></span>
+                            </a>
+                        </li>
+                        <li class="live-panel-leftitem">
+                                <a href="https://live.bilibili.com/pages/area/ent" class="live-panel-leftlink">
+                                 <i class="leftArrow"></i>
+                                 <span>唱见舞见<i class="rightArrow"></i></span>
+                                </a>
+                        </li>
+                        <li class="live-panel-leftitem">
+                                <a href="https://live.bilibili.com/pages/area/ent" class="live-panel-leftlink">
+                                 <i class="leftArrow"></i>
+                                 <span>御宅文化<i class="rightArrow"></i></span>
+                                </a>
+                        </li>
+                        <li class="live-panel-leftitem">
+                                <a href="https://live.bilibili.com/single" class="live-panel-leftlink">
+                                 <i class="leftArrow"></i>
+                                <span>单机联机<i class="rightArrow"></i></span>
+                                </a>
+                        </li>
+                        <li class="live-panel-leftitem">
+                                <a href="https://live.bilibili.com/online" class="live-panel-leftlink">
+                                 <i class="leftArrow"></i>
+                                <span>网络游戏<i class="rightArrow"></i></span>
+                                </a>
+                        </li>
+                        <li class="live-panel-leftitem">
+                                <a href="https://live.bilibili.com/e-sports" class="live-panel-leftlink">
+                                 <i class="leftArrow"></i>
+                                <span>电子竞技<i class="rightArrow"></i></span>
+                                </a>
+                        </li>
+                        <li class="live-panel-leftitem">
+                                <a href="https://live.bilibili.com/mobile-game" class="live-panel-leftlink">
+                                 <i class="leftArrow"></i>
+                                <span>手游直播<i class="rightArrow"></i></span>
+                                </a>
+                        </li>
+                    </ul>
+                    <div class="live-panel-right">
+                        <a target="_blank" href="https://h.bilibili.com" class="picvideo" alt="图文配">
+                        <img src="camera.png" />
+                        </a>
+                        <a target="_blank" href="https://vc.bilibili.com" class="picvideo" alt="小视频">
+                            <img src="video.png" />
+                        </a>
+                    </div>
+                </div>
+         </li>
+         <li class="horizontal-list side-nav">
+                <a href="https://www.bilibili.com/blackroom/" class="side-link">
+                    <i class="blackroom"></i><span>小黑屋</span></a>
+         </li>
+        </ul>
+        <div class="nav-gif">
+            <a :href="giflink" class="gif-container" target="_blank" >
+             <img :src="gifsrc" alt="animation" />
+            </a>
+        </div>
+      </div>
+      <div id="slide" class="bili-wrapper">
+          <div class="slide-container clearfix ">
+            <my-slide v-for="(item,index) in content" v-bind:show="showlist[index]" v-bind:link="links[index]" v-bind:tname="transitionname" v-bind:hehe="item" v-on:mouseover.native="stopLoop" v-on:mouseout.native="continueLoop"></my-slide>
+            <div class="slide-title">
+                <a :href="link" target="_blank" alt="title" class="slide-title-link">
+                    {{title}}
+                </a>
+            </div>
+            <ul class="slide-trigger">
+                <li v-for="(item,index) in content" :class="showlist[index]? 'eat-pic':'slide-trigger-item'" v-on:click="switchPic(index)">
+                   
+                </li>
+            </ul>
+            <a class="slide-more-info" :href="morelink" target="_blank" >更多</a>
+          </div>
+          <div class="recommend-panel clearfix " >
+            <recommend-card v-for="item in recommendInfo" v-bind:link="item.link" v-bind:title="item.title" 
+            v-bind:imgsrc="item.imgsrc" v-bind:author="item.author" v-bind:count="item.count" >
+            </recommend-card>
+            <span class="review-btn pre" v-on:click="preview">{{tips[0].tip}}</span>
+            <span class="review-btn next" v-on:click="nextview">{{tips[1].tip}}</span>
+          </div>
+      </div>
+         
+    
+     <div id="movable-pic" class="bili-wrapper ">
+            <div class="right-column clearfix">
+                    <div class="on-line-info">
+                       <a href="https://www.bilibili.com/video/online.html" target="_blank" > <span class="on-line-number">在线人数：12345</span></a>
+                       <a href="https://www.bilibili.com/newlist.html" target="_blank" > <span class="on-line-vote">最新投稿:123</span> </a>                    </div>
+                    <a href="" target="_blank" ><img src="advertisement.jpg" /></a>
+            </div>
+        <div class="left-video-container clearfix">
+            <div class="header-left-video">
+                <i class="bili-icon advocate"></i>
+                <span>推广</span>
+            </div>
+            <div class="content-left-video">
+            <my-movable v-for="(item, index) in videoList" v-bind:parameter-object="item" :class="advocateContainer">
+            </my-movable>
+            </div>
+        </div>
+     
+    
+     </div>
+     <div id="movable-nav" :class="{'edit-state':editable}" :style="{top:topNav+'px'}">
+        <div class='edit-guide' :class="{'edit-open':editable}">
+            <img src="editguide.png" />
+        </div>
+        <ul id="fixed-nav" >
+     
+          <li  v-for="(item,index) in items" 
+          v-on:mousedown="handlemousedown($event,index)"   v-on:click="scrollTarget(index)"
+           class="movable-nat-item" :class="{'movable-selected':isSelected[index]}"  >
+             {{item}}
+          </li>  
+        <div class="movable-nat-item customize" v-on:click="setEditable" >
+            <i class="bili-icon updownarrow">
+            </i>
+            排序
+        </div>
+        <div class="hidden-block" :style="{top:top+'px'}" v-show="show" >{{content}}</div>
+       </ul>
+       <div class="mask-block" :class="{'mask-block-show':editable}" :style="{ height:totalHeight+'px' ,'z-index':zindex}"  v-on:mousemove="handlemaskmove($event)" v-on:mouseup="handlemaskup($event)" v-on:mouseout="handlemaskout($event)"></div>
+        <div class="hinge">
+        </div>
+        <div class="bili-icon back-top" v-on:click="srollToTop">
+    
+        </div>
+        <div class="app-download" >
+            <a href="https://app.bilibili.com/?channel=home_recommend" target="_blank">
+                <div class="download-icon" :style="{'background-position-x':bgx+'px'}" v-on:mouseover="standby" v-on:mouseout="backtosleep">
+                </div>
+                <transition name="tip-show">
+                    <div class="download-tip" v-show="tipshow">
+            
+                    </div>
+                </transition>
+            </a>
+        </div>
+    </div>
+    <!--below is for all the parts which can be moved referring to the side nav bar-->
+    <div id="module-game" class="bili-wrapper">
+        this is module-game
+    </div>
+    <div id="module-national" class="bili-wrapper">
+        this is module-national
+    </div>
+    <div id="module-series" class="bili-wrapper">
+        this is module-series
+    </div>
+    <div id="module-live" class="bili-wrapper">
+       <div class="right-column-width module-live-height clearfix">
+           <div class='right-column-tab'>
+               <div class='tab-item' v-on:click="switchTab(0)" :class="{'tab-item-selected':isselected[0]}"><span class='tab-item-desc'>直播排行<div class='module-live-select' v-show="isselected[0]"><div class='module-live-selectimg'></div></div></span></div>
+               <div class='tab-item' v-on:click="switchTab(1)" :class="{'tab-item-selected':isselected[1]}"><span class='tab-item-desc'>关注的主播<div class='module-live-select' v-show="isselected[1]"><div class='module-live-selectimg'></div></div></span></div>
+               <div class='tab-item' v-on:click="switchTab(2)" :class="{'tab-item-selected':isselected[2]}"><span class='tab-item-desc'>为你推荐<div class='module-live-select' v-show="isselected[2]"><div class='module-live-selectimg'></div></div></span></div>
+           </div>
+        <div class="right-column-content "  :style="{left:left+'px'}">
+         <my-live-ant v-for="(item,index) in smalllivelist" v-bind:num="item.num" v-bind:livelink="item.livelink"
+         v-bind:photosrc="item.photosrc" v-bind:viewcount="item.viewcount" v-bind:postname="item.postname" v-bind:desc="item.desc" >
+        </my-live-ant>
+        </div>
+        <div class="right-column-content "  :style="{left:left+260+'px'}">
+            没有数据(-_-#)
+        </div>
+        <div class="right-column-content "  :style="{left:left+520+'px'}">
+         <div class="carousel-recommendation" v-on:mouseover="stopSlideLoop" v-on:mouseout="setSlideLoop" >
+            <template v-for="(item,index) in carouselArray ">
+            <div class='carousel-slide' :style="{left:cleft+index*width+'px'}">
+             <a :href="item.link" target="_blank" >
+                 <img :src="item.src" />
+             </a>
+            </div>
+            </template>
+           <!-- <div class='carousel-slide' :style="{left:cleft+260+'px'}">
+                <a href="" target="_blank" >
+                    <img src="bili_recommendation2.webp" />
+                </a>
+            </div>
+            <div class='carousel-slide':style="{left:cleft+520+'px'}">
+                <a href="" target="_blank" >
+                    <img src="bili_recommendation3.webp" />
+                </a>
+            </div>-->
+            <div class='carousel-desc'>
+               <span>{{desc}}</span>
+            </div>
+            <div class='carousel-control-container'>
+                <div class='carousel-control-panel'>
+                    <template v-for="(item,index) in widthArray">
+                     <div class='carousel-control' :class="{'carousel-extend':carousel[index]}" :style="{width:item,'margin-left':margin,'margin-right':margin}" v-on:mouseover.stop="handlemouseovercarousel(index)" v-on:mouseout.stop="handlemouseoutcarousel">
+                    </div>
+                    </template>
+                    <!--<div class='carousel-control' :class="{'carousel-extend':carousel[0]}" v-on:mouseover.stop="handlemouseovercarousel(0)" v-on:mouseout.stop="handlemouseoutcarousel">
+                    </div>
+                    <div class='carousel-control '  :class="{'carousel-extend':carousel[1]}" v-on:mouseover.stop="handlemouseovercarousel(1)" v-on:mouseout.stop="handlemouseoutcarousel">
+                    </div>
+                    <div class='carousel-control'  :class="{'carousel-extend':carousel[2]}" v-on:mouseover.stop="handlemouseovercarousel(2)" v-on:mouseout.stop="handlemouseoutcarousel">
+                    </div>-->
+                </div>
+            </div>
+         </div>
+         <div class="recommendation-adv">
+            <a href="" target="_blank"><img style="float:left;" src="data:image/png;base64,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" alt="有文画"></a>
+            <a href="" target="_blank"><img style="float:right;"src="data:image/png;base64,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" alt="小视频"></a> 
+         </div>
+        </div>
+           
+       </div>
+       <div class="left-column-relative module-live-height clearfix">
+        <div class="left-column-header">
+          <i class='bili-icon live-icon'></i>
+          <span class="left-column-headername">正在直播</span>
+          <p class="online-info">当前共有<span>{{livenumber}}</span>个在线直播</p>
+          <a href="http" target="_blank" ><i class="bili-icon fire"></i>
+          <span class='fire-entry'>233秒居然能做到这些</span></a>
+          <div class="left-column-more"><span>更多</span><i class='bili-icon arrow-right'></i></div>
+          <div class="left-column-refresh" v-on:click="resetUpdates" v-show="updatesnum>0"><i class='bili-icon refresh'></i>{{updatesnum}}条新动态</div>
+        </div>
+        <div class="left-column-content">
+            <my-live-tenant v-for="(item,index) in biglivelists" 
+            v-bind:imagesrc="item.imagesrc" v-bind:contentsrc="item.contentsrc"
+            v-bind:host="item.host" v-bind:ahreflink="item.ahreflink"
+            v-bind:number="item.number" v-bind:desc="item.desc" 
+            v-bind:info="item.info"></my-live-tenant>
+        </div>
+       </div>
+    </div>
+    <div id="module-dance" class="bili-wrapper">
+        this is module dance 
+    </div>
+    <div id="module-life" class="bili-wrapper">
+        this is module life
+    </div>
+    <div id="module-fashion" class="bili-wrapper">
+        this is moduel-fashion
+    </div>
+    <div id="module-demon" class="bili-wrapper">
+        this is moduel-demon
+    </div>
+    <div id="module-animation" class="bili-wrapper">
+        this is module-animation
+    </div>
+    <div id="module-film" class="bili-wrapper">
+        this is module-film
+    </div>
+    <div id="module-entertain" class="bili-wrapper">
+        this is module-entertain
+    </div>
+    <div id="module-ft" class="bili-wrapper">
+        this is moduel-ft
+    </div>
+    <div id="module-tv" class="bili-wrapper">
+        this is module-tv
+    </div>
+    <div id="module-doc" class="bili-wrapper">
+        this is module-doc
+    </div>
+    <div id="module-music" class="bili-wrapper">
+        this is module-music
+    </div>
+    <div id="module-science" class="bili-wrapper">
+        this is module-science
+    </div>
+    <div id="module-adv" class="bili-wrapper">
+        this is module-adv
+    </div> 
+    </body>
+</html>

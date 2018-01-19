@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Test the manipulation of location of elements</title>
+        <link rel="stylesheet" type="text/css" href="testjq.css" />
+        <script src="vue.js" ></script>
+        <script src="jquery-3.2.1.js" ></script>
+        <script>
+         $(document).ready(function(){
+            var list=[{title:'red',id:'1'},{title:'black',id:'2'},
+            {title:'pink',id:'3'},
+            {title:'blue',id:'4'},
+            {title:'gray',id:'5'},
+            {title:'yellow',id:'6'},
+            {title:'green',id:'7'},];
+
+            var vue = new Vue({
+                el:'#test-blocks',
+                data:{
+                    items:list
+                }
+            });
+            setTimeout(function(){
+              $("#9").insertBefore("#8");
+              console.log("hahahahah switch");
+
+              $("#1").insertAfter("#2");
+            },3000);
+
+         })
+        </script>
+    </head>
+    <body>
+   <div id="test-blocks">
+       <div id="8" class='location six' >
+
+       </div>
+       <div id="9" class='location seven'>
+
+       </div>
+       <div v-for="(item,index) in items" :id="item.id" class="location"
+       :style="{'background-color':item.title}">
+       {{item.title}}
+    </div>
+
+   </div>
+    </body>
+</html>

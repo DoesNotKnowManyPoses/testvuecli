@@ -2,11 +2,166 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta charset="utf-8"/>
+    <link rel="shortcut icon" href="https://static.hdslb.com/images/favicon.ico">
+    <title>哔哩哔哩 (゜-゜)つロ 干杯~-bilibili</title>    
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>testclivue</title>
   </head>
   <body>
     <div id="app"></div>
+    <div id="header" >
+      <div class="backgroundimg">
+        <div class="mask">
+        </div>
+        <div class="bili-wrapper clearfix ">
+           <div class="left-header">
+              <ul>
+               <li class="left-header-item home">
+                  
+                   <a href="htt" class="left-header-link" target="_blank" title="" >
+                       <i class="bili-icon homeicon "></i>
+                       主站</a></li>
+               <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" >画友</a></li>
+               <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" v-on:mouseover.capture="showGamePanel" v-on:mouseout.capture="hideGamePanel">游戏中心</a>
+                   <transition name="game-panel">
+                   <div  class="game-panel" v-if="gamepanelshow" v-on:mouseover="showGamePanel" v-on:mouseout="hideGamePanel" >
+                      
+                       <div class="left-game-panel " >
+                            <a :href="largeGame.hreflink" class="leftup-game-panel" target="_blank" >
+                                <img :src="largeGame.srclink" />
+                            </a>
+                            <ul class="small-game-list">
+                                <li  class="small-game-item" v-for="(item,index) in middleGameList" v-bind:key="index" >
+                                    <a :href="item.hreflink" class="small-game-link">
+                                        <img :src="item.srclink" />
+                                        <p class="game-desc">{{item.desc}}</p>
+                                    </a>     
+                                </li>
+                            </ul>
+                       </div>
+                       <div class="right-game-panel">
+                          <div class="rightup-game-panel">
+                             <img src="./static/foreshow.gif" class="rightup-game-img" />
+                             <a href="" target="_blank" class="forum-link">
+                                 游戏论坛
+                             </a>
+                          </div>
+                          <ul class="rightup-game-list">
+                              <li  v-for="(item,index) in smallGameList" v-bind:key="index" class="rightup-game-item" v-on:mouseover="showPic(index)" v-on:mouseout="hidePic">
+                                  <a :href="item.hreflink" class="rightup-game-link">
+                                     <span>{{item.desc}}</span>
+                                  </a>
+                              </li>
+                          </ul>
+                       </div>
+                       <div class="rightup-pic" v-show="picshow">
+                         <img :src="srclink" />
+                       </div>
+                   </div> 
+                   </transition>
+               </li>
+               <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" v-on:mouseover="showLivePanel" v-on:mouseout="hideLivePanel">直播</a>
+               <transition name="game-panel">
+               <div class="header-live-panel" v-if="livepanelshow" v-on:mouseover="showLivePanel" v-on:mouseout="hideLivePanel">
+                   <div class="header-live-lf">
+                      <p class="live-title">热门直播:</p>
+                      <div class="hot-live" >
+                         <a  class="hot-live-item" v-for="(item,index) in liveList" v-bind:key="index" :href="item.hreflink">
+                               <img :src="item.srclink" />
+                               <i>LIVE</i>
+                               <span>{{item.host}}</span>
+                         </a>
+   
+                        </div>
+                   </div>
+                   <div class="header-live-rf">
+                      <p class="live-title title2">热门活动:</p>
+                      <div class="header-live-activity">
+                          <a href="" target="_blank" title="" >
+                              <img src="./static/bilibili_activity4.jpg" />
+                          </a>
+                      </div>
+                   </div>
+                 </div></transition></li>
+               <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" >会员购</a></li>
+               <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" >周边</a></li>
+               <li class="left-header-item"><a href="htt" class="left-header-link" target="_blank" title="" >移动端</a></li>
+              </ul>
+           </div>
+           <div class="right-header-upload" v-on:mouseover.capture="showuploadpanel" v-on:mouseout.capture="hideuploadpanel">
+              <a href="http:upload" target="_blank" class="upload-link">
+                  投稿
+              </a> 
+              <transition name="game-panel">
+              <ul class="upload-item" v-show="votepanelshow">
+                   <li>
+                     <a href="" target="_blank" >
+                         <i class="bili-icon rect art"></i>
+                         <span>专栏投稿</span>
+                     </a>
+                   </li>
+                   <li>
+                     <a href="" target="_blank" >
+                         <i class="bili-icon rect audio"></i>
+                         <span>音频投稿</span>
+                     </a>
+                   </li>
+                   <li>
+                     <a href="" target="_blank" >
+                         <i class="bili-icon rect video"></i>
+                         <span>视频投稿</span>
+                     </a>
+                   </li>
+                   <li>
+                     <a href="" target="_blank" >
+                         <i class="bili-icon rect vote"></i>
+                         <span>投稿管理</span>
+                     </a>
+                   </li>
+                   <li>
+                     <a href="" target="_blank" >
+                         <i class="bili-icon rect creation"></i>
+                         <span>创作中心</span>
+                     </a>
+                   </li>
+                </ul>
+               </transition>
+           </div>
+           <div class="user-menu">
+               <div class="user-menu-first"><a href="http" target="_blank"  ><img class="user-pic" src="./static/user.jpg" /></a></div>
+               <div class="left-header-item"><a href="http" target="_blank" class="left-header-link" >历史</a></div>
+           </div>
+        </div>
+      </div>
+      <div class="backimglink">
+          <div class="bili-wrapper head-content">
+               <a href="//www.bilibili.com" class="head-logo" ><img src="./static/bilibili_logo.webp" /></a> 
+               <div class="search">
+                       <a href="//www.bilibili.com/ranking?spm_id_from=333.334.banner_link.1" target="_blank" class="link-ranking"><span>排行榜</span></a>
+                      <div class="searchPanel"> <input v-on:click.stop="" v-on:focus.stop="showHistory"  v-on:input="getHint" id="searchKeyword" autocomplete="off" v-model="christmas" type="text" placeholder="老铁，往门里踢啊" class="searchInput" /><button  v-on:click="doSearch" class="submitButton"></button>
+                       <ul v-if="show" class="showstatus">
+                           <li class="list-tip" ><div class="base-line">
+                           <span class="history-tip">
+                           历史记录
+                           </span>
+                           </div></li>
+                           <transition-group name="list" tag="li">
+                           <li class="list-item" is="history-list" v-for="(item,index) in historyList" v-bind:history="item" v-bind:key="item.title"  v-bind:link="buildLink(item.title)" v-bind:cancel="showDelete" v-on:remove="deleteHistory(index)"></li>
+                       </transition-group>    
+                       </ul> 
+                           <ul v-if="hintShow" class="showstatus">
+                               <li class="list-tip" ><div class="base-line">
+                               <span class="history-tip">
+                               关键词
+                               </span>
+                               </div></li>
+                               <li class="list-item" is="history-list" v-for="(item,index) in hintFileter(hintList,christmas)" v-bind:history="item" v-bind:link="buildLink(item.title)" v-bind:cancel="hideDelete" v-on:remove="deleteHistory(index)"></li>
+                               </ul> 
+                       </div>
+               </div>
+          </div> 
+      </div>
+     </div>
     <!-- built files will be auto injected -->
   </body>
 </html>
