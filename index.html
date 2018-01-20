@@ -29,12 +29,12 @@
                       
                        <div class="left-game-panel " >
                             <a :href="largeGame.hreflink" class="leftup-game-panel" target="_blank" >
-                                <img :src="largeGame.srclink" />
+                                <img v-lazy="largeGame.srclink" />
                             </a>
                             <ul class="small-game-list">
                                 <li  class="small-game-item" v-for="(item,index) in middleGameList" v-bind:key="index" >
                                     <a :href="item.hreflink" class="small-game-link">
-                                        <img :src="item.srclink" />
+                                        <img v-lazy="item.srclink" />
                                         <p class="game-desc">{{item.desc}}</p>
                                     </a>     
                                 </li>
@@ -56,7 +56,7 @@
                           </ul>
                        </div>
                        <div class="rightup-pic" v-show="picshow">
-                         <img :src="srclink" />
+                         <img v-lazy="srclink" />
                        </div>
                    </div> 
                    </transition>
@@ -68,7 +68,7 @@
                       <p class="live-title">热门直播:</p>
                       <div class="hot-live" >
                          <a  class="hot-live-item" v-for="(item,index) in liveList" v-bind:key="index" :href="item.hreflink">
-                               <img :src="item.srclink" />
+                               <img v-lazy="item.srclink" />
                                <i>LIVE</i>
                                <span>{{item.host}}</span>
                          </a>
@@ -424,7 +424,7 @@
      v-bind:photosrc="item.photosrc" v-bind:viewcount="item.viewcount" v-bind:postname="item.postname" v-bind:desc="item.desc" >
     </my-live-list>
     </div>
-    <div class="right-column-content "  :style="{left:left+260+'px'}">
+    <div class="right-column-content "  :style="{left:left+260+'px'}" v-bind:data-hehe="heheh">
         没有数据(-_-#)
     </div>
     <div class="right-column-content "  :style="{left:left+520+'px'}">
@@ -432,7 +432,7 @@
         <template v-for="(item,index) in carouselArray ">
         <div class='carousel-slide' :style="{left:cleft+index*width+'px'}">
          <a :href="item.link" target="_blank" >
-             <img :src="item.src" />
+             <img v-lazy="item.src" />
          </a>
         </div>
         </template>

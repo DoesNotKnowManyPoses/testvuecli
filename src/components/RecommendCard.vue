@@ -1,7 +1,7 @@
 <template>
 <div class="recommend-card">
             <a :href="link" :title="title" target="_blank" >
-              <img :src="imgsrc" class="img-card" />
+              <img v-lazy="imgsrc" class="img-card" />
               <div class="card-mark">
                 <p class="title">{{title}}</p>
                 <p class="author">{{author}}</p>

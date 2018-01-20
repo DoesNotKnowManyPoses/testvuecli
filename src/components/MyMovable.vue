@@ -1,7 +1,7 @@
 <template>
           <div class="video-container" :class="mycontainer">
         <a :href="hreflink" target="_blank" >
-        <img :src="srclink" />
+        <img v-lazy="srclink" />
         <div class="movable-pic-container" v-if="show" v-on:mouseover="startMovable($event)" v-on:mousemove="move($event)" v-on:mouseout="hideMovable">
         <p v-for="(item,index) in bullets" class="row-bullet" :class="{'second-row':isSecondRow(index)}" :style="bulletStyle[index]" ref="p">{{bullets[index]}}</p>
         <div class="percent-bar">

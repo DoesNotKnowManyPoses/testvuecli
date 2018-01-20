@@ -2,7 +2,7 @@
   <div class="module-live-rank">
   <div class="module-live-ranknumber" :class="{'module-live-top':num<=3}" >{{num}}</div>
   <a :href="livelink"> 
-  <img :src="photosrc" class="module-live-rankimg" />
+  <img v-lazy="photosrc" class="module-live-rankimg" />
   <div class="module-live-rankdesc">
   <div class="module-live-rankupdesc">
   <span class="module-live-viewcount clearfix">{{viewcount}}</span>

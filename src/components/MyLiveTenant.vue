@@ -2,7 +2,7 @@
    <div class="module-live-teant-container">
             <a :href="ahreflink" target="_blank">
             <div class="module-live-teant-content">
-            <img :src="contentsrc" />
+            <img v-lazy="contentsrc" />
             <div class="module-live-teant-content-info">
             <span class="module-fl">{{host}}</span><span class="module-fr">{{number}}</span>
             </div>

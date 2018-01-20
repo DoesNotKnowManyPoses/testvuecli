@@ -7,6 +7,7 @@ function createLivePanelVue () {
     el: '#module-live',
     components: {MyLiveList, MyLiveTenant},
     data: {
+      heheh:'hehehehehehehehe',
       livenumber: 10000,
       updatesnum: 12345,
       biglivelists: [{imagesrc: './static/hahaha.jpg', contentsrc: './static/bilibili_recommend3.jpg', host: '葡萄美酒夜光杯', ahreflink: 'http', number: '3333', desc: '不知明镜里，何处得秋霜。', info: '战争·出战'}, {imagesrc: './static/bilibili_recommend2.jpg', contentsrc: './static/movablevideo4.webp', host: '葡萄美酒夜光杯', ahreflink: 'http', number: '3333', desc: '欲渡黄河冰塞川，将登太行雪满山', info: '战争·出战'},

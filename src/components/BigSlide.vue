@@ -1,7 +1,7 @@
 <template>
     <transition v-bind:name='tname' mode='out-in'>
         <a :href='link' v-show='show' class='original-location'> 
-           <img :src='hehe' />
+           <img v-lazy='hehe' />
         </a>   
     </transition>  
 </template>
