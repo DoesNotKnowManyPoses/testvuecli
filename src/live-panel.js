@@ -30,7 +30,7 @@ function createLivePanelVue () {
       desc: '',
       margin: '1%',
       widthArray: ['50%', '25%', '25%'],
-      smalllivelist: [{num: 1, livelink: 'http', photosrc: 'host3.jpg', viewcount: '23W', postname: '一日不见三秋隔', desc: '三秋不见已忘君'},
+      smalllivelist: [{num: 1, livelink: 'http', photosrc: './static/host3.jpg', viewcount: '23W', postname: '一日不见三秋隔', desc: '三秋不见已忘君'},
         {num: 2, livelink: 'http', photosrc: './static/host2.jpg', viewcount: '6.0W', postname: '君住长江头', desc: '妾在长江尾'},
         {num: 3, livelink: 'http', photosrc: './static/host4.jpg', viewcount: '5.3W', postname: '思君不见君', desc: '你就去死吧'},
         {num: 4, livelink: 'http', photosrc: './static/host5.jpg', viewcount: '4.1W', postname: '接天莲叶无穷碧', desc: '映日荷花别样红'},

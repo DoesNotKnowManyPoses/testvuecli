@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import BigSlide from './components/BigSlide.vue'
+import BigSlide from './components/BigSlide'
 import RecommendCard from './components/RecommendCard'
 
 function createSlideAndRecommendVue () {

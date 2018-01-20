@@ -18,7 +18,7 @@ a{
 #titles{
     position: relative;
     height:59px;
-    z-index:6;
+    z-index:12;
     margin-top:4px;
 }
 .horizontal-list{
@@ -97,6 +97,7 @@ a{
  border-radius: 6px;
  z-index:101;
  margin-top:8px;
+ overflow: hidden;
 }
 
 .horizontal-list-container{
@@ -1544,6 +1545,7 @@ margin-left:590px;
 -ms-user-select:none;
 user-select:none;
 transition: top 0.6s ease;
+z-index:10;
 }
 .edit-state{
 /*background-color: rgba(17, 16, 16, 0.7);/*hehe*/
