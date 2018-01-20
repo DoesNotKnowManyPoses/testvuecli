@@ -26,7 +26,7 @@ a{
     position:relative;
     width:40px;
     list-style: none;
-    margin-right: 18px;
+    margin-right: 14px;
     z-index:100;
 }
 .homelink{
@@ -2235,7 +2235,7 @@ border: 1px solid #e5e9ef;
         width:980px;
     }
     .horizontal-list{
-        margin-right:9px;
+        margin-right:7px;
     }
     #movable-nav{
         margin-left:500px;

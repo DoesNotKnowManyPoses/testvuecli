@@ -9,6 +9,7 @@
   </head>
   <body>
     <div id="app"></div>
+    <!-- html for header part -->
     <div id="header" >
       <div class="backgroundimg">
         <div class="mask">
@@ -162,6 +163,372 @@
           </div> 
       </div>
      </div>
+     <!--nested menu list -->
+     <div id="titles" class="bili-wrapper">
+      <ul class="horizontal-list-container">
+       <li class="horizontal-list">
+           <a href="https" target="_blank" class="homelink">
+               <i class="home-icon"></i>
+               <span>首页</span>
+           </a>
+       </li>
+       <li class="horizontal-list" is="nested-list" v-for="(item,index) in hehe" v-bind:key="index" v-bind:list="item" v-bind:location="index"
+       v-bind:show="showarray[index]" v-bind:show2="showarray2[index]"
+       v-on:showlist="showOptionList" v-on:showlist2="showOptionList2" v-on:hidelist="hideOptionList" v-on:hidelist2="hideOptionList2" v-on:move="goMove" v-on:back="goBack" > <!--这里不用加参数-->
+
+       </li>
+       <li class="horizontal-list side-nav" >
+          <a href="https://www.bilibili.com/read/home" class="side-link">
+              <i class="s-column"></i>
+                  <span>专栏</span>
+          </a>
+       </li>
+       <li class="horizontal-list side-nav">
+              <a href="https://www.bilibili.com/square" class="side-link">
+                  <i class="square"></i><span>广场</span></a>
+              <div class="square-content">
+                  <ul class="left-square">
+                    <li class="left-square-item">
+                      <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                      <i class="left-icon icon-vip"></i><span>会员购</span>
+                      </a>
+                    </li>
+                  <li class="left-square-item">
+                      <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                      <i class="left-icon icon-activity"></i><span>活动中心</span>
+                      </a>
+                  </li>
+                  <li class="left-square-item">
+                      <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                      <i class="left-icon icon-game"></i><span>游戏中心</span>
+                      </a>
+                  </li>
+                  <li class="left-square-item">
+                          <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                              <i class="left-icon icon-news"></i><span>新闻中心</span>
+                          </a>
+                  </li>
+                  <li class="left-square-item">
+                          <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                              <i class="left-icon icon-painter"></i><span>画友</span>
+                          </a>
+                  </li>
+                  <li class="left-square-item">
+                          <a href="https://show.bilibili.com/platform/home.html" class="left-square-link">
+                              <i class="left-icon icon-tv"></i><span>芒果TV</span>
+                          </a>
+                  </li>
+                  </ul>
+                  <div class="right-square">
+                       <div class="right-square-item">
+                              <a href="https://www.bilibili.com/blackboard/activity_list.html?spm_id_from=333.334.primary_menu.93" 
+                              target="_blank" title="bilibili 活动">
+                              <div class="lazy-img">
+                                  <img alt="" src="bilibili_activity.jpg">
+                              </div>
+                              </a>
+               
+                       </div>
+                       <div class="right-square-item">
+                              <a href="https://www.bilibili.com/blackboard/topic_list.html" target="_blank" title="话题列表">
+                                  <div class="lazy-img">
+                                  <img alt="" src="bilibili_topic.jpg" />
+                                  </div>
+                              </a>
+                       </div>
+                  </div>
+              </div>
+       </li>
+       <li class="horizontal-list side-nav">
+              <a href="https://live.bilibili.com" class="side-link">
+                  <i class="live"></i><span>直播</span></a>
+              <div class="live-panel">
+                  <ul class="live-panel-left">
+                      <li class="live-panel-leftitem">
+                          <a href="https://live.bilibili.com/subject" class="live-panel-leftlink">
+                           <i class="leftArrow"></i>
+                           <span>推荐主播<i class="rightArrow"></i></span>
+                          </a>
+                      </li>
+                      <li class="live-panel-leftitem">
+                              <a href="https://live.bilibili.com/pages/area/ent" class="live-panel-leftlink">
+                               <i class="leftArrow"></i>
+                               <span>生活娱乐<i class="rightArrow"></i></span>
+                              </a>
+                          </li>
+                      <li class="live-panel-leftitem">
+                          <a href="https://live.bilibili.com/draw" class="live-panel-leftlink">
+                           <i class="leftArrow"></i>
+                          <span>绘画专区<i class="rightArrow"></i></span>
+                          </a>
+                      </li>
+                      <li class="live-panel-leftitem">
+                              <a href="https://live.bilibili.com/pages/area/ent" class="live-panel-leftlink">
+                               <i class="leftArrow"></i>
+                               <span>唱见舞见<i class="rightArrow"></i></span>
+                              </a>
+                      </li>
+                      <li class="live-panel-leftitem">
+                              <a href="https://live.bilibili.com/pages/area/ent" class="live-panel-leftlink">
+                               <i class="leftArrow"></i>
+                               <span>御宅文化<i class="rightArrow"></i></span>
+                              </a>
+                      </li>
+                      <li class="live-panel-leftitem">
+                              <a href="https://live.bilibili.com/single" class="live-panel-leftlink">
+                               <i class="leftArrow"></i>
+                              <span>单机联机<i class="rightArrow"></i></span>
+                              </a>
+                      </li>
+                      <li class="live-panel-leftitem">
+                              <a href="https://live.bilibili.com/online" class="live-panel-leftlink">
+                               <i class="leftArrow"></i>
+                              <span>网络游戏<i class="rightArrow"></i></span>
+                              </a>
+                      </li>
+                      <li class="live-panel-leftitem">
+                              <a href="https://live.bilibili.com/e-sports" class="live-panel-leftlink">
+                               <i class="leftArrow"></i>
+                              <span>电子竞技<i class="rightArrow"></i></span>
+                              </a>
+                      </li>
+                      <li class="live-panel-leftitem">
+                              <a href="https://live.bilibili.com/mobile-game" class="live-panel-leftlink">
+                               <i class="leftArrow"></i>
+                              <span>手游直播<i class="rightArrow"></i></span>
+                              </a>
+                      </li>
+                  </ul>
+                  <div class="live-panel-right">
+                      <a target="_blank" href="https://h.bilibili.com" class="picvideo" alt="图文配">
+                      <img src="camera.png" />
+                      </a>
+                      <a target="_blank" href="https://vc.bilibili.com" class="picvideo" alt="小视频">
+                          <img src="video.png" />
+                      </a>
+                  </div>
+              </div>
+       </li>
+       <li class="horizontal-list side-nav">
+              <a href="https://www.bilibili.com/blackroom/" class="side-link">
+                  <i class="blackroom"></i><span>小黑屋</span></a>
+       </li>
+      </ul>
+      <div class="nav-gif">
+          <a :href="giflink" class="gif-container" target="_blank" >
+           <img :src="gifsrc" alt="animation" />
+          </a>
+      </div>
+    </div>
+    <!-- html for the first slide and recommend card -->
+    <div id="slide" class="bili-wrapper">
+        <div class="slide-container clearfix ">
+          <big-slide v-for="(item,index) in content" v-bind:show="showlist[index]" v-bind:link="links[index]" v-bind:tname="transitionname" v-bind:hehe="item" v-on:mouseover.native="stopLoop" v-on:mouseout.native="continueLoop"></big-slide>
+          <div class="slide-title">
+              <a :href="link" target="_blank" alt="title" class="slide-title-link">
+                  {{title}}
+              </a>
+          </div>
+          <ul class="slide-trigger">
+              <li v-for="(item,index) in content" :class="showlist[index]? 'eat-pic':'slide-trigger-item'" v-on:click="switchPic(index)">
+                 
+              </li>
+          </ul>
+          <a class="slide-more-info" :href="morelink" target="_blank" >更多</a>
+        </div>
+        <div class="recommend-panel clearfix " >
+          <recommend-card v-for="item in recommendInfo" v-bind:link="item.link" v-bind:title="item.title" 
+          v-bind:imgsrc="item.imgsrc" v-bind:author="item.author" v-bind:count="item.count" >
+          </recommend-card>
+          <span class="review-btn pre" v-on:click="preview">{{tips[0].tip}}</span>
+          <span class="review-btn next" v-on:click="nextview">{{tips[1].tip}}</span>
+        </div>
+    </div>
+    <!-- html for the promotion panel, which has the functionality to review the content of the video -->
+    <div id="movable-pic" class="bili-wrapper ">
+        <div class="right-column clearfix">
+                <div class="on-line-info">
+                   <a href="https://www.bilibili.com/video/online.html" target="_blank" > <span class="on-line-number">在线人数：12345</span></a>
+                   <a href="https://www.bilibili.com/newlist.html" target="_blank" > <span class="on-line-vote">最新投稿:123</span> </a>                    </div>
+                <a href="" target="_blank" ><img src="./static/advertisement.jpg" /></a>
+        </div>
+    <div class="left-video-container clearfix">
+        <div class="header-left-video">
+            <i class="bili-icon advocate"></i>
+            <span>推广</span>
+        </div>
+        <div class="content-left-video">
+        <my-movable v-for="(item, index) in videoList" v-bind:parameter-object="item" :class="advocateContainer">
+        </my-movable>
+        </div>
+    </div>
+ 
+
+ </div>
+ <!--html for the side nav bar -->
+ <div id="movable-nav" :class="{'edit-state':editable}" :style="{top:topNav+'px'}">
+    <div class='edit-guide' :class="{'edit-open':editable}">
+        <img src="./static/editguide.png" />
+    </div>
+    <ul id="fixed-nav" >
+ 
+      <li  v-for="(item,index) in items" 
+      v-on:mousedown="handlemousedown($event,index)"   v-on:click="scrollTarget(index)"
+       class="movable-nat-item" :class="{'movable-selected':isSelected[index]}"  >
+         {{item}}
+      </li>  
+    <div class="movable-nat-item customize" v-on:click="setEditable" >
+        <i class="bili-icon updownarrow">
+        </i>
+        排序
+    </div>
+    <div class="hidden-block" :style="{top:top+'px'}" v-show="show" >{{content}}</div>
+   </ul>
+   <div class="mask-block" :class="{'mask-block-show':editable}" :style="{ height:totalHeight+'px' ,'z-index':zindex}"  v-on:mousemove="handlemaskmove($event)" v-on:mouseup="handlemaskup($event)" v-on:mouseout="handlemaskout($event)"></div>
+    <div class="hinge">
+    </div>
+    <div class="bili-icon back-top" v-on:click="srollToTop">
+
+    </div>
+    <div class="app-download" >
+        <a href="https://app.bilibili.com/?channel=home_recommend" target="_blank">
+            <div class="download-icon" :style="{'background-position-x':bgx+'px'}" v-on:mouseover="standby" v-on:mouseout="backtosleep">
+            </div>
+            <transition name="tip-show">
+                <div class="download-tip" v-show="tipshow">
+        
+                </div>
+            </transition>
+        </a>
+    </div>
+</div>
+<!-- html for the main parts like dance, comics -->
+<div id="module-game" class="bili-wrapper">
+    this is module-game
+</div>
+<div id="module-national" class="bili-wrapper">
+    this is module-national
+</div>
+<div id="module-series" class="bili-wrapper">
+    this is module-series
+</div>
+<div id="module-live" class="bili-wrapper">
+   <div class="right-column-width module-live-height clearfix">
+       <div class='right-column-tab'>
+           <div class='tab-item' v-on:click="switchTab(0)" :class="{'tab-item-selected':isselected[0]}"><span class='tab-item-desc'>直播排行<div class='module-live-select' v-show="isselected[0]"><div class='module-live-selectimg'></div></div></span></div>
+           <div class='tab-item' v-on:click="switchTab(1)" :class="{'tab-item-selected':isselected[1]}"><span class='tab-item-desc'>关注的主播<div class='module-live-select' v-show="isselected[1]"><div class='module-live-selectimg'></div></div></span></div>
+           <div class='tab-item' v-on:click="switchTab(2)" :class="{'tab-item-selected':isselected[2]}"><span class='tab-item-desc'>为你推荐<div class='module-live-select' v-show="isselected[2]"><div class='module-live-selectimg'></div></div></span></div>
+       </div>
+    <div class="right-column-content "  :style="{left:left+'px'}">
+     <my-live-list v-for="(item,index) in smalllivelist" v-bind:num="item.num" v-bind:livelink="item.livelink"
+     v-bind:photosrc="item.photosrc" v-bind:viewcount="item.viewcount" v-bind:postname="item.postname" v-bind:desc="item.desc" >
+    </my-live-list>
+    </div>
+    <div class="right-column-content "  :style="{left:left+260+'px'}">
+        没有数据(-_-#)
+    </div>
+    <div class="right-column-content "  :style="{left:left+520+'px'}">
+     <div class="carousel-recommendation" v-on:mouseover="stopSlideLoop" v-on:mouseout="setSlideLoop" >
+        <template v-for="(item,index) in carouselArray ">
+        <div class='carousel-slide' :style="{left:cleft+index*width+'px'}">
+         <a :href="item.link" target="_blank" >
+             <img :src="item.src" />
+         </a>
+        </div>
+        </template>
+       <!-- <div class='carousel-slide' :style="{left:cleft+260+'px'}">
+            <a href="" target="_blank" >
+                <img src="bili_recommendation2.webp" />
+            </a>
+        </div>
+        <div class='carousel-slide':style="{left:cleft+520+'px'}">
+            <a href="" target="_blank" >
+                <img src="bili_recommendation3.webp" />
+            </a>
+        </div>-->
+        <div class='carousel-desc'>
+           <span>{{desc}}</span>
+        </div>
+        <div class='carousel-control-container'>
+            <div class='carousel-control-panel'>
+                <template v-for="(item,index) in widthArray">
+                 <div class='carousel-control' :class="{'carousel-extend':carousel[index]}" :style="{width:item,'margin-left':margin,'margin-right':margin}" v-on:mouseover.stop="handlemouseovercarousel(index)" v-on:mouseout.stop="handlemouseoutcarousel">
+                </div>
+                </template>
+                <!--<div class='carousel-control' :class="{'carousel-extend':carousel[0]}" v-on:mouseover.stop="handlemouseovercarousel(0)" v-on:mouseout.stop="handlemouseoutcarousel">
+                </div>
+                <div class='carousel-control '  :class="{'carousel-extend':carousel[1]}" v-on:mouseover.stop="handlemouseovercarousel(1)" v-on:mouseout.stop="handlemouseoutcarousel">
+                </div>
+                <div class='carousel-control'  :class="{'carousel-extend':carousel[2]}" v-on:mouseover.stop="handlemouseovercarousel(2)" v-on:mouseout.stop="handlemouseoutcarousel">
+                </div>-->
+            </div>
+        </div>
+     </div>
+     <div class="recommendation-adv">
+        <a href="" target="_blank"><img style="float:left;" src="data:image/png;base64,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" alt="有文画"></a>
+        <a href="" target="_blank"><img style="float:right;"src="data:image/png;base64,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" alt="小视频"></a> 
+     </div>
+    </div>
+       
+   </div>
+   <div class="left-column-relative module-live-height clearfix">
+    <div class="left-column-header">
+      <i class='bili-icon live-icon'></i>
+      <span class="left-column-headername">正在直播</span>
+      <p class="online-info">当前共有<span>{{livenumber}}</span>个在线直播</p>
+      <a href="http" target="_blank" ><i class="bili-icon fire"></i>
+      <span class='fire-entry'>233秒居然能做到这些</span></a>
+      <div class="left-column-more"><span>更多</span><i class='bili-icon arrow-right'></i></div>
+      <div class="left-column-refresh" v-on:click="resetUpdates" v-show="updatesnum>0"><i class='bili-icon refresh'></i>{{updatesnum}}条新动态</div>
+    </div>
+    <div class="left-column-content">
+        <my-live-tenant v-for="(item,index) in biglivelists" 
+        v-bind:imagesrc="item.imagesrc" v-bind:contentsrc="item.contentsrc"
+        v-bind:host="item.host" v-bind:ahreflink="item.ahreflink"
+        v-bind:number="item.number" v-bind:desc="item.desc" 
+        v-bind:info="item.info"></my-live-tenant>
+    </div>
+   </div>
+</div>
+<div id="module-dance" class="bili-wrapper">
+    this is module dance 
+</div>
+<div id="module-life" class="bili-wrapper">
+    this is module life
+</div>
+<div id="module-fashion" class="bili-wrapper">
+    this is moduel-fashion
+</div>
+<div id="module-demon" class="bili-wrapper">
+    this is moduel-demon
+</div>
+<div id="module-animation" class="bili-wrapper">
+    this is module-animation
+</div>
+<div id="module-film" class="bili-wrapper">
+    this is module-film
+</div>
+<div id="module-entertain" class="bili-wrapper">
+    this is module-entertain
+</div>
+<div id="module-ft" class="bili-wrapper">
+    this is moduel-ft
+</div>
+<div id="module-tv" class="bili-wrapper">
+    this is module-tv
+</div>
+<div id="module-doc" class="bili-wrapper">
+    this is module-doc
+</div>
+<div id="module-music" class="bili-wrapper">
+    this is module-music
+</div>
+<div id="module-science" class="bili-wrapper">
+    this is module-science
+</div>
+<div id="module-adv" class="bili-wrapper">
+    this is module-adv
+</div> 
     <!-- built files will be auto injected -->
   </body>
 </html>
