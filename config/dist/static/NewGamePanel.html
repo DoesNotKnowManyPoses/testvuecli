@@ -1,0 +1,751 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+    <link rel="stylesheet" type="text/css" href="testVue.css" />
+    <script src="vue.js" ></script>
+    <script src="jquery-3.2.1.js" ></script>
+    <meta charset="utf-8" />
+    <script>
+      
+        Vue.component('my-live-tenant',{
+            template:' \
+            <div class="module-live-teant-container">\
+            <a :href="ahreflink" target="_blank">\
+            <div class="module-live-teant-content">\
+            <img :src="contentsrc" />\
+            <div class="module-live-teant-content-info">\
+            <span class="module-fl">{{host}}</span><span class="module-fr">{{number}}</span>\
+            </div>\
+            <div class="module-live-teant-image" :style="{backgroundImage:\'url(\'+imagesrc+\')\'}">\
+            </div>\
+            </div>\
+            <div class="module-live-teant-desc">{{desc}}</div>\
+            <div class="module-live-teant-info">{{info}}</div>\
+            </a>\
+            </div>\
+            \
+            ',
+            props:['imagesrc','contentsrc','host','ahreflink','number','desc','info']
+        })
+        Vue.component("my-movable",{
+        template:'\
+        <div class="video-container" :class="mycontainer">\
+        <a :href="hreflink" target="_blank" >\
+        <img :src="srclink" />\
+        <div class="movable-pic-container" v-on:mouseover="startMovable($event)" v-on:mousemove="move($event)" v-on:mouseout="hideMovable">\
+        <p v-for="(item,index) in bullets" class="row-bullet" :class="{\'second-row\':isSecondRow(index)}" :style="bulletStyle[index]" ref="p">{{bullets[index]}}</p>\
+        <div class="percent-bar">\
+        <div class="percent" :style="{width:ratio+\'%\'}"></div>\
+        </div>\
+        <div class="movable-pic" :style="[bgposition,backgroundImage]">\
+        </div>\
+        <div class="later-watch">\
+        </div>\
+        <span class="duration">{{duration}}</span>\
+        </div>\
+        <p class="video-description">{{description}}</p>\
+        </a>\
+        </div>\
+        ',
+        props:{
+            parameterObject:{
+                type:Object
+                // default:function(){
+                //     return {
+                //         num: "",
+                //         srclink: 'movablevideo.webp',
+                //         imgsrc: '',
+                //         bulletURL: "",
+                //         hreflink: ""
+                //     }
+                // }
+            },
+            mycontainer:{
+                type:String
+            }
+        },
+        data:function(){
+            return {
+               left:0,
+               top:10,
+               startLeft:0,
+               startTop:0,
+               width:160,
+               height:90,
+               description:this.parameterObject.desc,
+               duration:this.parameterObject.duration,
+               hreflink:this.parameterObject.hreflink,
+               num:this.parameterObject.num,
+              // num:48,
+               numPerRow:10,
+               ratio:0,
+               srclink:this.parameterObject.srclink,
+               //srclink:"movablevideo.webp",
+              // backgroundImgSrc:"movablepic2.webp",
+               backgroundImgSrc:this.parameterObject.imgsrc,
+               bgposition:{
+                backgroundPositionX:"0px",
+                backgroundPositionY:"0px"
+               },
+               showMovablePic:false,
+               timeoutList:[],
+               looptimeout:null,
+               timeInterval:null,
+               bulletStyle:[],
+               bulletURL:this.parameterObject.bulletURL,
+               bullets:['呵呵呵呵','哈哈航昂昂哈','好好学习','秦时明月汉时关','粒粒皆辛苦']
+            }
+        },
+        methods:{
+              startMovable:function(event){
+                this.setNewPosition(event); //根据鼠标的位置，直接定位到对应的背景图片的位置
+                this.showBullet();//弹幕准备发射
+              },
+              move:function(event){
+                this.setNewPosition(event); //这个事件只会触发背景图片位置的切换。
+              },
+              /*根据鼠标的水平位置，设置背景图片的位置，来模拟预览*/
+              setNewPosition:function(event){
+                  var offset=event.offsetX;
+                  this.startTop=event.offsetY;
+                  this.ratio = offset*100.0/this.width;
+                  var sequence = Math.floor(offset*this.num/(this.width+1));
+                  var sequenceV = Math.floor(sequence/this.numPerRow);
+                  var sequenceH = sequence%this.numPerRow;
+                  this.left = 0-sequenceH*this.width;
+                  this.top = 0- sequenceV*this.height;
+                  console.log("sequence is "+sequenceH+" "+sequenceV);
+                  this.bgposition.backgroundPositionX=this.left+"px";
+                  this.bgposition.backgroundPositionY=this.top+"px";
+              },
+              /*弹幕第一行还是第二行*/
+              isSecondRow:function(index){
+                  return index%2!=0;
+              },
+              /**/
+              reloadBullets:function(){
+                 this.timeoutList.forEach(function(timeout){//清除没跑完的setTimeout
+                     clearTimeout(timeout);
+                 });
+                 this.timeoutList=[];                  
+                 this.bulletStyle.splice(0,this.bulletStyle.length); //清除新设定的目标位置
+              },
+              /*将已经设置了bulletstyle的timeout保留，还未执行的timeout取消掉*/
+              hideMovable:function(){
+                  var start = this.bulletStyle.length;   
+                  var end = this.timeoutList.length; 
+                 for(var i = start;i<end; i ++){
+                     clearTimeout(this.timeoutList[i]);
+                 }
+                 this.timeoutList.splice(start,end-start);
+                 clearTimeout(this.looptimeout);
+              },
+              showBullet:function(){
+                var bulletList = this.$refs.p;
+                var that = this;
+                var start = this.bulletStyle.length;
+                if(start==bulletList.length&&start>0){//弹幕已经弹完，需要弄一个循环
+                    this.looptimeout = setTimeout( function(){
+                              that.reloadBullets();
+                              that.showBullet();
+                          },7000);
+                   return;
+                }
+                for(var i = start ; i < bulletList.length; i ++){
+                  this.timeoutList.push(setTimeout(function(index){
+                     return function(){
+                     var length = bulletList[index].clientWidth;
+                     var style={};
+                     style.left="-"+length+"px";
+                     style.transition="all 5s linear";
+                      that.bulletStyle.push(style);
+                      console.log("index is "+index);
+                      if(index==bulletList.length-1){
+                          that.looptimeout=setTimeout(function(){
+                              that.reloadBullets();
+                              that.showBullet();
+                          },7000);
+                      }
+                     };
+                  }(i),(i-start)*1000));
+                }
+              }
+             },
+             computed:{
+                backgroundImage:function(){
+                    return {
+                        background:"url('"+this.backgroundImgSrc+"') 0 0 no-repeat"
+                    };
+                }
+             }
+
+       });
+
+       window.onload=function(){
+    //    var gameVue = new Vue({
+    //        el:"#game",
+    //        data:{
+    //         gamepanelshow:true,
+    //         picshow:false,
+    //         srclink:"",
+    //         largeGame:{hreflink:"http://game.bilibili.com/fgo/fes/",srclink:"fate2.gif"},
+    //         middleGameList:[{hreflink:"",srclink:"game.gif",desc:"碧蓝航线"},{hreflink:"",srclink:"game.gif",desc:"寂暗星空"},{hreflink:"",srclink:"game.gif",desc:"修真世界"}],
+    //         smallGameList:[{hreflink:"",desc:"决战，平安京",srclink:"pkanjk.png"},{hreflink:"",desc:"武装色霸气路飞",srclink:"hjkuke.jpg"},{hreflink:"",desc:"九刀流阿修罗",srclink:"capcom.png"},{hreflink:"",desc:"赤魔疯脚",srclink:"pkanjk.png"},
+    //         {hreflink:"",desc:"王之蔑视",srclink:"hjkuke.jpg"},{hreflink:"",desc:"大玉螺旋丸",srclink:"pkanjk.png"},{hreflink:"",desc:"重建罗生门",srclink:"capcom.png"}],
+    //         liveList:[{hreflink:"",srclink:"host1.jpg",host:"梦醒三年梦"},{hreflink:"",srclink:"host2.jpg",host:"今昔是何年"},{hreflink:"",srclink:"host3.jpg",host:"乘风归去"},{hreflink:"",srclink:"host4.jpg",host:"琼楼玉宇"},{hreflink:"",srclink:"host5.jpg",host:"高处不胜寒"},{hreflink:"",srclink:"host6.jpg",host:"何似在人间"}],
+
+    //       },
+    //       methods:{
+    //         showPic:function(index){
+    //             this.srclink=this.smallGameList[index].srclink;
+    //             this.picshow=true;
+    //         },
+    //         hidePic:function(){
+    //             this.picshow=false;
+    //         }
+    //       }
+    //    });
+      
+    //    var movableVue = new Vue({
+    //        el:"#movable",
+    //        data:{
+    //         pobject:{
+    //         num:48,
+    //         srclink:'movablevideo.webp',
+    //         imgsrc:'movablepic2.webp',
+    //         bulletURL:"",
+    //         hreflink:"",
+    //         desc:"你知道我是谁么？我可是天选之子",
+    //         duration:"4.37"
+    //         },
+    //         firstExample:"first-example",
+    //            left:0,
+    //            top:10,
+    //            startLeft:0,
+    //            startTop:0,
+    //            width:160,
+    //            height:90,
+    //            num:41,
+    //            numPerRow:10,
+    //            ratio:0,
+    //            backgroundImage:{
+    //             background:'url("movablepic.webp") 0 0 no-repeat'
+    //            },
+    //            bgposition:{
+    //             backgroundPositionX:"0px",
+    //             backgroundPositionY:"0px"
+    //            },
+    //            showMovablePic:false,
+    //            timeoutList:[],
+    //            looptimeout:null,
+    //            timeInterval:null,
+    //            bulletStyle:[],
+    //            bullets:['好可爱','小姐姐跳的真好','这么可爱一定是男孩子','笑哭惹','疯狂打call','lllll']
+    //        },
+    //        methods:{
+              
+    //         startMovable:function(event){
+    //           this.setNewPosition(event); //根据鼠标的位置，直接定位到对应的背景图片的位置
+    //           this.showBullet();//弹幕准备发射
+    //         },
+    //         move:function(event){
+    //           this.setNewPosition(event); //这个事件只会触发背景图片位置的切换。
+    //         },
+    //         /*根据鼠标的水平位置，设置背景图片的位置，来模拟预览*/
+    //         setNewPosition:function(event){
+    //             var offset=event.offsetX;
+    //             this.startTop=event.offsetY;
+    //             this.ratio = offset*100.0/this.width;
+    //             var sequence = Math.floor(offset*this.num/(this.width+1));
+    //             var sequenceV = Math.floor(sequence/this.numPerRow);
+    //             var sequenceH = sequence%this.numPerRow;
+    //             this.left = 0-sequenceH*this.width;
+    //             this.top = 0- sequenceV*this.height;
+    //             console.log("sequence is "+sequenceH+" "+sequenceV);
+    //             this.bgposition.backgroundPositionX=this.left+"px";
+    //             this.bgposition.backgroundPositionY=this.top+"px";
+    //         },
+    //         /*弹幕第一行还是第二行*/
+    //         isSecondRow:function(index){
+    //             return index%2!=0;
+    //         },
+    //         /**/
+    //         reloadBullets:function(){
+    //            this.timeoutList.forEach(function(timeout){//清除没跑完的setTimeout
+    //                clearTimeout(timeout);
+    //            });
+    //            this.timeoutList=[];                  
+    //            this.bulletStyle.splice(0,this.bulletStyle.length); //清除新设定的目标位置
+    //         },
+    //         /*将已经设置了bulletstyle的timeout保留，还未执行的timeout取消掉*/
+    //         hideMovable:function(){
+    //             var start = this.bulletStyle.length;   
+    //             var end = this.timeoutList.length; 
+    //            for(var i = start;i<end; i ++){
+    //                clearTimeout(this.timeoutList[i]);
+    //            }
+    //            this.timeoutList.splice(start,end-start);
+    //            clearTimeout(this.looptimeout);
+    //         },
+    //         showBullet:function(){
+    //           var bulletList = this.$refs.p;
+    //           var that = this;
+    //           var start = this.bulletStyle.length;
+    //           if(start==bulletList.length&&start>0){//弹幕已经弹完，需要弄一个循环
+    //               this.looptimeout = setTimeout( function(){
+    //                         that.reloadBullets();
+    //                         that.showBullet();
+    //                     },7000);
+    //              return;
+    //           }
+    //           for(var i = start ; i < bulletList.length; i ++){
+    //             this.timeoutList.push(setTimeout(function(index){
+    //                return function(){
+    //                var length = bulletList[index].clientWidth;
+    //                var style={};
+    //                style.left="-"+length+"px";
+    //                style.transition="all 5s linear";
+    //                 that.bulletStyle.push(style);
+    //                 console.log("index is "+index);
+    //                 if(index==bulletList.length-1){
+    //                     that.looptimeout=setTimeout(function(){
+    //                         that.reloadBullets();
+    //                         that.showBullet();
+    //                     },7000);
+    //                 }
+    //                };
+    //             }(i),(i-start)*1000));
+    //           }
+    //         }
+    //        }
+    //    })
+    function switchElement(source,target){
+        console.log("received index are "+source+" "+target);
+        var sourceid="#"+idlist[source];
+        var targetid= "#"+idlist[target];
+        if(source<target){
+        $(sourceid).insertAfter(targetid);
+        }
+        else if(source>target){
+        $(sourceid).insertBefore(targetid);
+        }
+        else{
+            return;
+        }
+
+        var idtmp = idlist[source];
+        idlist.splice(source, 1);
+        idlist.splice(target, 0, idtmp);
+
+        var sizetmp = sizelist[source];
+        sizelist.splice(source, 1);
+        sizelist.splice(target, 0, sizetmp);
+       
+    }
+    var hehehehehe = new Vue({
+        el:"#module-live-tenant",
+        data:{
+            livelists:[{imagesrc:'hahaha@.webp',contentsrc:'bilibili_recommend2.jpg',host:'葡萄美酒夜光杯',ahreflink:'http',number:'3333',desc:'欲饮琵琶马上催,醉卧沙场君莫笑，古来征战几人回。不知明镜里，何处得秋霜。',info:'战争·出战'}]
+        }
+    });
+
+    window.onscroll=function(e){
+        var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+        var availableHeight = document.documentElement.clientHeight ;
+         vueNav.adjustTop(availableHeight,scrollTop);
+         vueNav.changeSelecte(scrollTop);
+    }
+    var sizelist = [300,400,500,400,300,500,700,200,400,600,300,500,200,700,400,500,300];
+    var idlist=['module-game','module-national','module-series','module-live','module-dance','module-life','module-fashion','module-demon','module-animation','module-film','module-entertain','module-ft','module-tv','module-doc','module-music','module-science','module-adv']
+    // var vueNav = new Vue({
+    //     el:"#movable-nav",
+    //     data:{
+    //        height:32,
+    //        width:40,
+    //        show:false,
+    //        top:0,
+    //        content:"呵呵",
+    //        totalHeight:280,
+    //        zindex:-1,
+    //        mousedownpoint:0,
+    //        starttop:0,
+    //        topNav:150,
+    //        isSelected:[],
+    //        aftermousedown:false,
+    //        editable:false,
+    //        timer:null,
+    //        bgx:0,
+    //        startindex:0,
+    //        targetindex:0,
+    //        navHeight:768,
+    //        tipshow:false,
+    //        items:['游戏','国创','番剧','直播','舞蹈','生活','时尚','鬼畜','动画','电影','娱乐','影视','TV剧','纪录片','音乐','科技','广告'],
+    //        highItems:sizelist
+    //     },
+    //     created:function(){
+    //        this.totalHeight = this.height * this.items.length;
+    //        console.log("total height is "+this.totalHeight);
+    //        for(var i = 0 ; i < this.items.length; i ++){
+    //            this.isSelected.push(false);
+    //        }
+    //     },
+    //     methods:{
+    //         handlemousedown:function(event,index){
+    //          if(this.editable){//hehe只有可编辑状态下才需要后续的记录
+    //          this.showhiddenblock(event,index);
+    //          this.zindex = 3;
+    //          this.content = this.items[index];
+    //          this.aftermousedown = true;
+    //          }
+    //         },
+    //         handlemouseup:function(event,index){
+    //         },
+    //         showhiddenblock:function(event,index){
+    //          this.top = index*this.height;
+    //          this.show = true;
+    //          this.mousedownpoint = this.top+event.offsetY;
+    //          this.starttop = this.top;
+    //          this.startindex = index;
+    //         },
+    //         handlemaskdown:function(event){
+    
+    //         },
+    //         handlemaskmove:function(event){
+    //          if(!this.aftermousedown) return;
+    //          var offy = event.offsetY;
+    //          this.top = this.top+(offy-this.mousedownpoint);
+    //          this.mousedownpoint = offy;
+    //          var direction = this.top > this.starttop;//hehe应该用最终结果的偏移来决定方向，而不是用两次move的偏移来决定方向，因为我先下10 再上5 大体还是往下，但是只看这两次的话，方向是向上的。
+    //          var index = Math.floor(this.top/this.height);
+    //          //console.log(direction);
+    //          var move = direction? this.top - this.starttop : this.starttop - this.top;//hehe如果是往上移动，那么偏移应该是指相比于上一个格子的底部，而不是顶部
+    //          if((direction&&index==this.items.lenght-1))
+    //          return;
+    //          if(move>=(this.height/2 + 5)){
+    //             if(direction){
+    //                 var current = this.items[index];
+    //                 var next = this.items[index+1];
+    //                 this.items.splice(index,2,next,current);
+    //                 this.starttop = this.starttop+this.height;//hehe换了位置以后要更新新的起点位置.
+    //                // console.log("change from "+(index+1)+" to "+index);
+    //             }
+    //             else{
+    //                 var current = this.items[index]; //hehe这里求得的index应该是上一个的index，因为top移动到了目标头上
+    //                 var next = this.items[index+1];
+    //                 this.items.splice(index,2,next,current);
+    //                 this.starttop = this.starttop - this.height;
+    //                // console.log("change from "+(index)+" to "+(index+1));
+    //             }
+    //            //console.log("index "+index+" direction "+direction+" move "+move+" top "+this.top);
+    //          }
+    //         },
+    //         handlemaskup:function(event){
+    //          this.aftermousedown = false;
+    //          this.show = false;
+    //          this.zindex = -1;
+    //          this.targetindex = Math.floor(this.starttop/this.height);
+    //          switchElement(this.startindex,this.targetindex);
+    //         },
+    //         notselect:function(){
+    //             return false;
+    //         },
+    //         changeSelecte:function(position){
+    //            // console.log("received top is "+position);
+    //             var total = 0;
+    //             this.isSelected=[];
+    //           for(var i = 0 ; i < this.highItems.length; i ++){
+    //             var current = this.highItems[i];
+    //             if(total<=position&&current+total>position){
+    //                 this.isSelected.push(true);
+    //             }
+    //             else{
+    //                 this.isSelected.push(false);
+    //             }
+    //             // console.log("total is "+total);
+    //             // console.log("current is "+current);
+    //             total = total + current;
+    //           }
+    //           console.log(this.isSelected);
+    //         },
+    //         scrollTarget:function(index){
+    //             if(this.editable) return;
+    //             var target = 0 ;
+    //             for(var i = 0 ; i < index ; i ++){
+    //                 target+=this.highItems[i];
+    //             }
+    //             window.scrollTo(0,target);
+    //         },
+    //         setEditable:function(){
+    //             this.editable = !this.editable;
+    //         },
+    //         srollToTop:function(){
+    //             window.scrollTo(0,0);
+    //         },
+    //         standby:function(){
+    //          clearInterval(this.timer);
+    //          var count = 0 ;
+    //          var that = this;
+    //          this.tipshow = true;
+    //          this.timer=setInterval(function(){
+    //             that.bgx = 0- count*80;
+    //             count++;
+    //             if(count>=16){
+    //                 count= count -6;
+    //             }
+    //          },90);
+    //         },
+    //         backtosleep:function(){
+    //         clearInterval(this.timer);
+    //         this.tipshow = false;
+    //         var that = this;
+    //         this.timer = setInterval(function(){
+    //           that.bgx=that.bgx+80;
+    //           if(that.bgx>=0){
+    //               clearInterval(that.timer);
+    //              that.bgx = 0;
+    //           }
+    //         },90);
+    //         },
+    //         adjustTop:function(height,scrollTop){
+    //             console.log("height is "+height);
+    //             if(scrollTop==0){
+    //                 this.topNav="150";
+    //                 return;
+    //             }
+    //           if(height<=this.navHeight){
+    //               this.topNav = 0;
+    //           }
+    //           else{
+    //               this.topNav = Math.floor((height-this.navHeight)/2);
+    //           }
+    //         }
+
+    //     }
+    // });
+    
+    // var blockVue = new Vue({
+    //     el:"#many-blocks",
+    //     data:{
+    //         items:sizelist
+    //     }
+    // })
+       }
+    </script>
+ </head>
+ <body >
+   <!--<div id="game" class="game-panel">
+       <div class="left-game-panel " v-show="gamepanelshow">
+            <a :href="largeGame.hreflink" class="leftup-game-panel" target="_blank" >
+                <img :src="largeGame.srclink" />
+            </a>
+            <ul class="small-game-list">
+                <li  class="small-game-item" v-for="(item,index) in middleGameList" v-bind:key="index" >
+                    <a :href="item.hreflink" class="small-game-link">
+                        <img :src="item.srclink" />
+                        <p class="game-desc">{{item.desc}}</p>
+                    </a>     
+                </li>
+            </ul>
+       </div>
+       <div class="right-game-panel">
+          <div class="rightup-game-panel">
+             <img src="foreshow.gif" class="rightup-game-img" />
+             <a href="" target="_blank" class="forum-link">
+                 游戏论坛
+             </a>
+          </div>
+          <ul class="rightup-game-list">
+              <li  v-for="(item,index) in smallGameList" v-bind:key="index" class="rightup-game-item" v-on:mouseover="showPic(index)" v-on:mouseout="hidePic">
+                  <a :href="item.hreflink" class="rightup-game-link">
+                     <span>{{item.desc}}</span>
+                  </a>
+              </li>
+          </ul>
+       </div>
+       <div class="rightup-pic" v-show="picshow">
+         <img :src="srclink" />
+       </div>
+       <div class="header-live-panel">
+        <div class="header-live-lf">
+           <p class="live-title">热门直播:</p>
+           <div class="hot-live" >
+              <a  class="hot-live-item" v-for="(item,index) in liveList" v-bind:key="index" :href="item.hreflink">
+                    <img :src="item.srclink" />
+                    <i>LIVE</i>
+                    <span>{{item.host}}</span>
+              </a>
+              
+             </div>
+        </div>
+        <div class="header-live-rf">
+           <p class="live-title title2">热门活动:</p>
+           <div class="header-live-activity">
+               <a href="" target="_blank" title="" >
+                   <img src="bilibili_activity4.jpg" />
+               </a>
+           </div>
+        </div>
+      </div>
+   </div>
+   <ul class="upload-item">
+      <li>
+        <a href="" target="_blank" >
+            <i class="bili-icon rect art"></i>
+            <span>专栏投稿</span>
+        </a>
+      </li>
+      <li>
+        <a href="" target="_blank" >
+            <i class="bili-icon rect audio"></i>
+            <span>音频投稿</span>
+        </a>
+      </li>
+      <li>
+        <a href="" target="_blank" >
+            <i class="bili-icon rect video"></i>
+            <span>视频投稿</span>
+        </a>
+      </li>
+      <li>
+        <a href="" target="_blank" >
+            <i class="bili-icon rect vote"></i>
+            <span>投稿管理</span>
+        </a>
+      </li>
+      <li>
+        <a href="" target="_blank" >
+            <i class="bili-icon rect creation"></i>
+            <span>创作中心</span>
+        </a>
+      </li>
+   </ul>
+-->
+
+<!--<div id="movable">
+<div  class="video-container">
+<a href="http" target="_blank" title="">
+<img src="movablevideo.webp" />
+<div   class="movable-pic-container" v-on:mouseover="startMovable($event)" v-on:mousemove="move($event)" v-on:mouseout="hideMovable" >
+    <p v-for="(item,index) in bullets" class="row-bullet" :class="{'second-row': isSecondRow(index)}" :style="bulletStyle[index]" ref="p">{{bullets[index]}}</p>
+    <div class="percent-bar">
+        <div class="percent" :style="{width:ratio+'%'}"></div>
+    </div>
+    <div class="movable-pic" :style="[bgposition,backgroundImage]" >
+    </div>
+   
+</div>
+<div class="later-watch">
+</div>
+</a>
+
+</div>
+<my-movable :parameter-object="pobject" v-bind:mycontainer="firstExample"  >
+<!--attribute is case-insensitive sad  -->
+<!--</my-movable>
+</div> -->
+<!--<div id="movable-nav" :class="{'edit-state':editable}" :style="{top:topNav+'px'}">
+    <ul id="fixed-nav" >
+      <div class='edit-guide' :class="{'edit-open':editable}">
+          <img src="editguide.png" />
+      </div>
+      <li  v-for="(item,index) in items" 
+      v-on:mousedown="handlemousedown($event,index)"   v-on:click="scrollTarget(index)"
+       class="movable-nat-item" :class="{'movable-selected':isSelected[index]}"  >
+         {{item}}
+      </li>  
+    <div class="movable-nat-item customize" v-on:click="setEditable" >
+        <i class="bili-icon updownarrow">
+        </i>
+        排序
+    </div>
+    <div class="hinge">
+
+    </div>
+    <div class="bili-icon back-top" v-on:click="srollToTop">
+
+    </div>
+    <div class="hidden-block" :style="{top:top+'px'}" v-show="show" >{{content}}</div>
+    <div class="mask-block" :style="{ height:totalHeight+'px' , 'z-index':zindex}"  v-on:mousemove="handlemaskmove($event)" v-on:mouseup="handlemaskup($event)"></div>
+    <div class="app-download" >
+        <a href="https://app.bilibili.com/?channel=home_recommend" target="_blank">
+            <div class="download-icon" :style="{'background-position-x':bgx+'px'}" v-on:mouseover="standby" v-on:mouseout="backtosleep">
+            </div>
+            <transition name="tip-show">
+                <div class="download-tip" v-show="tipshow">
+        
+                </div>
+            </transition>
+        </a>
+    </div>
+    </ul>
+ 
+</div>
+<!--<div id="many-blocks" class="bili-wrapper">
+ <div v-for="(item,index) in items" class="test-block" :style="{height:item+'px'}">
+    
+ </div>
+</div>-->
+<!--<div id="module-game" class="bili-wrapper">
+    this is module-game
+</div>
+<div id="module-national" class="bili-wrapper">
+    this is module-national
+</div>
+<div id="module-series" class="bili-wrapper">
+    this is module-series
+</div>
+<div id="module-live" class="bili-wrapper">
+    this is module-live
+</div>
+<div id="module-dance" class="bili-wrapper">
+    this is module dance 
+</div>
+<div id="module-life" class="bili-wrapper">
+    this is module life
+</div>
+<div id="module-fashion" class="bili-wrapper">
+    this is moduel-fashion
+</div>
+<div id="module-demon" class="bili-wrapper">
+    this is moduel-demon
+</div>
+<div id="module-animation" class="bili-wrapper">
+    this is module-animation
+</div>
+<div id="module-film" class="bili-wrapper">
+    this is module-film
+</div>
+<div id="module-entertain" class="bili-wrapper">
+    this is module-entertain
+</div>
+<div id="module-ft" class="bili-wrapper">
+    this is moduel-ft
+</div>
+<div id="module-tv" class="bili-wrapper">
+    this is module-tv
+</div>
+<div id="module-doc" class="bili-wrapper">
+    this is module-doc
+</div>
+<div id="module-music" class="bili-wrapper">
+    this is module-music
+</div>
+<div id="module-science" class="bili-wrapper">
+    this is module-science
+</div>
+<div id="module-adv" class="bili-wrapper">
+    this is module-adv
+</div> -->
+<div id="module-live-tenant">
+ <my-live-tenant v-for="(item,index) in livelists" 
+ v-bind:imagesrc="item.imagesrc" v-bind:contentsrc="item.contentsrc"
+ v-bind:host="item.host" v-bind:ahreflink="item.ahreflink"
+ v-bind:number="item.number" v-bind:desc="item.desc" 
+ v-bind:info="item.info"></my-live-tenant>
+</div>
+<div class="testrelative">
+    <div class="test1"></div>
+    <div class="test2"></div>
+</div>
+ </body>
+</html>

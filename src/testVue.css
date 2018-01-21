@@ -4,7 +4,7 @@
     margin:0 auto;
 }
 i{
-    background-image: url("./assets/backgroundIcon.png");
+    background-image: url("../static/backgroundIcon.png");
     width:17px;
     height:12px;
     display:block;
@@ -127,7 +127,7 @@ a{
     height:20px;
     left:-10px;
     top:8px;
-    background: url("./assets/icons2.png") 0 -1621px no-repeat;
+    background: url("../static/icons2.png") 0 -1621px no-repeat;
     
 }
 .link-style{
@@ -149,7 +149,7 @@ a{
     height:20px;
     right:35px;
     top:5px;
-    background: url("./assets/icons2.png") 0 -1581px no-repeat;
+    background: url("../static/icons2.png") 0 -1581px no-repeat;
 }
 .move-right{
     transform:translateX(10px);
@@ -175,7 +175,7 @@ a{
     width: 18px;
     height: 18px;
     margin: 3px auto 2px;
-    background: url("./assets/backgroundIcon.png") -87px -1814px no-repeat;
+    background: url("../static/backgroundIcon.png") -87px -1814px no-repeat;
  }
  .side-link, .square, .live,.classroom, .homelink span{
     margin:0;
@@ -192,21 +192,21 @@ a{
     width: 18px;
     height: 18px;
     margin: 3px auto 2px;
-    background: url("./assets/backgroundIcon.png") -87px -2006px no-repeat;
+    background: url("../static/backgroundIcon.png") -87px -2006px no-repeat;
  }
  .live{
     display: block;
     width: 18px;
     height: 18px;
     margin: 3px auto 2px;
-    background: url("./assets/backgroundIcon.png") -87px -1878px no-repeat;
+    background: url("../static/backgroundIcon.png") -87px -1878px no-repeat;
  }
  .blackroom{
     display: block;
     width: 18px;
     height: 18px;
     margin: 3px auto 2px;
-    background: url("./assets/backgroundIcon.png") -87px -1942px no-repeat;
+    background: url("../static/backgroundIcon.png") -87px -1942px no-repeat;
  }
  .nav-gif{
      position: absolute;
@@ -279,7 +279,7 @@ a{
     margin-top: 4px;
     vertical-align: top;
     display: inline-block;
-    background-image: url("./assets/backgroundIcon.png");
+    background-image: url("../static/backgroundIcon.png");
     vertical-align: text-bottom;
 }
 .icon-vip,.icon-activity{
@@ -387,7 +387,7 @@ a{
     height:20px;
     left:-6px;
     top:8px;
-    background: url("./assets/icons2.png") 0 -1621px no-repeat;
+    background: url("../static/icons2.png") 0 -1621px no-repeat;
 }
 
 .rightArrow{
@@ -397,7 +397,7 @@ a{
     height:20px;
     right:-100px;
     top:5px;
-    background: url("./assets/icons2.png") 0 -1581px no-repeat;
+    background: url("../static/icons2.png") 0 -1581px no-repeat;
     transition:all 0.3s ease;
 }
 .live-panel-leftitem:hover .rightArrow{
@@ -519,7 +519,7 @@ a{
       height:18px;
       background-position: -919px -790px;
       background-color: transparent;
-      background-image:url("./assets/backgroundIcon.png");
+      background-image:url("../static/backgroundIcon.png");
   }
   .eat-pic{
     position:relative;
@@ -527,7 +527,7 @@ a{
     width: 18px;
     height: 18px;
     margin-left:8px;
-    background-image:url("./assets/backgroundIcon.png");
+    background-image:url("../static/backgroundIcon.png");
     background-position: -855px -727px;
 
   }
@@ -567,7 +567,7 @@ a{
         height: 12px;
         margin: -2px 0 0 5px;
         vertical-align: middle;
-        background: url("./assets/backgroundIcon.png") -541px -218px;
+        background: url("../static/backgroundIcon.png") -541px -218px;
   }
   .slide-container:hover .slide-more-info{
     display:block;
@@ -655,7 +655,7 @@ opacity:1;
     right: 6px;
     bottom: 4px;
     cursor: pointer;
-    background-image: url("./assets/clock.gif");
+    background-image: url("../static/clock.gif");
 }
 .recommend-card:hover .later-watch{
     display:block;
@@ -682,7 +682,7 @@ opacity:1;
     opacity: 0;
     position: absolute;
     background-color: rgba(0,0,0,.6);
-    background-image: url("./assets/icons2.png");
+    background-image: url("../static/icons2.png");
     background-repeat: no-repeat;
     width: 20px;
     top: 50%;
@@ -717,7 +717,7 @@ opacity:1;
     z-index:1000;
     width:100%;
     height:42px;
-    background-image: url("./assets/background.png");
+    background-image: url("../static/background.png");
     background-position: center -10px;
 }
 .mask{
@@ -753,7 +753,7 @@ opacity:1;
 }
 
 .bili-icon{
-background-image: url("./assets/backgroundIcon.png") ;
+background-image: url("../static/backgroundIcon.png") ;
 }
 .homeicon{
 position:absolute;
@@ -824,7 +824,7 @@ top:13px;
     width:100%;
     height:170x;
     margin-top:-42px;
-    background-image: url("./assets/background.png");
+    background-image: url("../static/background.png");
     background-position: center -10px;
     z-index:100;
 }
@@ -872,7 +872,7 @@ top:13px;
 .link-ranking span{
     padding-left:26px;
     width:32px;
-    background: url("./assets/backgroundIcon.png") -659px -665px no-repeat;
+    background: url("../static/backgroundIcon.png") -659px -665px no-repeat;
 }
 .searchPanel{
     position:relative;
@@ -903,7 +903,7 @@ top:13px;
 .submitButton{
     
     position: relative;
-    background: url("./assets/backgroundIcon.png") -653px -720px;
+    background: url("../static/backgroundIcon.png") -653px -720px;
     width:40px;
     height:32px;
     display: inline-block;
@@ -915,7 +915,7 @@ top:13px;
     top:-3px;
 }
 .submitButton:hover{
-    background: url("./assets/backgroundIcon.png") -718px -720px;
+    background: url("../static/backgroundIcon.png") -718px -720px;
 }
 /*搜索历史专用CSS */
 
@@ -979,7 +979,7 @@ top:13px;
   }
   
   .cancel{
-    background: url("./assets/backgroundIcon.png") -461px -530px no-repeat;
+    background: url("../static/backgroundIcon.png") -461px -530px no-repeat;
     width:38px;
     height:28px;
     position:absolute;
@@ -988,7 +988,7 @@ top:13px;
     cursor:pointer;
   }
   .cancel:hover{
-    background: url("./assets/backgroundIcon.png") -525px -530px no-repeat;
+    background: url("../static/backgroundIcon.png") -525px -530px no-repeat;
   }
   .list-leave-active{
       transition:all 1s;
@@ -1082,7 +1082,7 @@ top:13px;
     width:200px;
     top:12px;
     height:236px;
-    background: url("./assets/line.png") 0 0 no-repeat;
+    background: url("../static/line.png") 0 0 no-repeat;
 }
 .rightup-game-list{
     position:absolute;
@@ -1689,7 +1689,7 @@ border: 1px solid #e5e9ef;
     left: -15px;
     width: 80px;
     height: 80px;
-    background-image: url("./assets/app-download.png");
+    background-image: url("../static/app-download.png");
    
 }
 .download-tip{
