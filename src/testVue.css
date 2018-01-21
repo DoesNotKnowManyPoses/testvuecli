@@ -878,12 +878,13 @@ top:13px;
     position:relative;
     width:268px;
     height:32px;
-    background-color: white;
     border-radius: 4px;
     opacity: 0.8;
+    background-color: white;
 }
+
 .searchPanel:hover{
-    opacity: 1.0;
+  opacity:1;
 }
 .searchInput{
     position: relative;
@@ -921,7 +922,7 @@ top:13px;
 .showstatus{
     position:absolute;
     left:0;
-    top:34px;
+    top:25px;
     list-style-type:none;
     background-color:white;
     padding:0 14px;

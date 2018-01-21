@@ -25,6 +25,9 @@ function createHeaderVue () {
       liveList: [{ hreflink: '', srclink: './static/host1.jpg', host: '梦醒三年梦' }, { hreflink: '', srclink: './static/host2.jpg', host: '今昔是何年' }, { hreflink: '', srclink: './static/host3.jpg', host: '乘风归去' }, { hreflink: '', srclink: './static/host4.jpg', host: '琼楼玉宇' }, { hreflink: '', srclink: './static/host5.jpg', host: '高处不胜寒' }, { hreflink: '', srclink: './static/host6.jpg', host: '何似在人间' }]
 
     },
+    mounted: function () {
+      document.addEventListener('click', this.hideHistoryandHint)
+    },
     methods: {
       showPic: function (index) {
         this.srclink = this.smallGameList[index].srclink
@@ -67,6 +70,10 @@ function createHeaderVue () {
           this.show = true
         }
       },
+      hideHistoryandHint: function () {
+        this.hideHistory()
+        this.hideHint()
+      },
       hideHistory: function (event) {
         if (event) {
           console.log(event)
@@ -102,6 +109,9 @@ function createHeaderVue () {
         return arr.filter(function (curVal, index, arr) {
           return curVal['title'].indexOf(key) !== -1
         })
+      },
+      hideHint: function () {
+        this.hintShow = false
       }
     }
   })
