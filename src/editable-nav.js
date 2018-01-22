@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import $ from 'jquery'
+import { clearTimeout } from 'timers'
 var sizelist = [300, 400, 500, 400, 300, 500, 700, 200, 400, 600, 300, 500, 200, 700, 400, 500, 300]
 var idlist = ['module-game', 'module-national', 'module-series', 'module-live', 'module-dance', 'module-life', 'module-fashion', 'module-demon', 'module-animation', 'module-film', 'module-entertain', 'module-ft', 'module-tv', 'module-doc', 'module-music', 'module-science', 'module-adv']
 function createSideNavVue () {
@@ -27,6 +28,7 @@ function createSideNavVue () {
   var sideNavVue = new Vue({
     el: '#movable-nav',
     data: {
+      throttle: null,
       height: 32,
       width: 40,
       show: false,
@@ -82,25 +84,30 @@ function createSideNavVue () {
       handlemaskdown: function (event) {
 
       },
-      handlemaskmove: function (event) {
-        if (!this.aftermousedown) return
-        var offy = event.offsetY
-        this.top = this.top + (offy - this.mousedownpoint)
-        this.mousedownpoint = offy
-        var direction = this.top > this.starttop// hehe应该用最终结果的偏移来决定方向，而不是用两次move的偏移来决定方向，因为我先下10 再上5 大体还是往下，但是只看这两次的话，方向是向上的。
+      throttlehandle: function () {
+        var direction = this.top > this.starttop // hehe应该用最终结果的偏移来决定方向，而不是用两次move的偏移来决定方向，因为我先下10 再上5 大体还是往下，但是只看这两次的话，方向是向上的。
         var index = Math.floor(this.top / this.height)
+        var sourceindex = Math.floor(this.starttop / this.height)
         // console.log(direction);
         var move = direction ? this.top - this.starttop : this.starttop - this.top// hehe如果是往上移动，那么偏移应该是指相比于上一个格子的底部，而不是顶部
-        if ((direction && index == this.items.lenght - 1)) { return }
+        if (direction && index - 1 >= sourceindex) {
+          this.items.splice(sourceindex, 1)
+          this.items.splice(index, 0, this.content)
+          this.starttop = index * this.height
+        } else if (!direction && sourceindex - 1 > index) {
+          this.items.splice(sourceindex, 1)
+          this.items.splice(index + 1, 0, this.content)
+          this.starttop = (index + 1) * this.height
+        }
         if (move >= (this.height / 2 + 5)) {
           if (direction) {
+            if (index == this.items.length - 1) return
             var current = this.items[index]
             var next = this.items[index + 1]
-            // this.items.splice(index,2,next,current);
             this.items.splice(index, 1, next)
             this.items.splice(index + 1, 1, current)
             this.starttop = this.starttop + this.height// hehe换了位置以后要更新新的起点位置.
-            // console.log("change from "+(index+1)+" to "+index);
+            console.log('change from ' + (index + 1) + ' to ' + index)
           } else {
             var current = this.items[index] // hehe这里求得的index应该是上一个的index，因为top移动到了目标头上
             var next = this.items[index + 1]
@@ -120,6 +127,21 @@ function createSideNavVue () {
         if (this.aftermousedown) { // 如果不是按住了鼠标，则不考虑移出的问题。
           this.mouseoffmask()
         }
+      },
+      handlemaskmove: function (event) {
+        if (!this.aftermousedown) return
+        var offy = event.offsetY
+        this.top = this.top + (offy - this.mousedownpoint)
+        this.top = this.top > this.totalHeight ? this.totalHeight : this.top
+        this.top = this.top < 0 ? 0 : this.top
+        this.mousedownpoint = offy // hehe 以上的内容需要跟随鼠标的移动来显示对应的位置，所以需要实时监听
+        if (this.throttle) {
+          window.clearTimeout(this.throttle) // clearTimeout应该是被别的注册了，所以只能显示调用了吧
+        }
+        var that = this
+        this.throttle = setTimeout(function () { // hehe关于列表的内容的移动，并不需要那么快的改变，所以用阀门控制一下。发现20是个还行的数字。
+          that.throttlehandle()
+        }, 20)
       },
       mouseoffmask: function () {
         this.aftermousedown = false
