@@ -107,7 +107,7 @@ function createSideNavVue () {
             this.items.splice(index, 1, next)
             this.items.splice(index + 1, 1, current)
             this.starttop = this.starttop + this.height// hehe换了位置以后要更新新的起点位置.
-            console.log('change from ' + (index + 1) + ' to ' + index)
+            // console.log('change from ' + (index + 1) + ' to ' + index)
           } else {
             var current = this.items[index] // hehe这里求得的index应该是上一个的index，因为top移动到了目标头上
             var next = this.items[index + 1]
@@ -121,7 +121,9 @@ function createSideNavVue () {
         }
       },
       handlemaskup: function (event) {
-        this.mouseoffmask()
+        if (this.aftermousedown) {
+          this.mouseoffmask()
+        }
       },
       handlemaskout: function (event) {
         if (this.aftermousedown) { // 如果不是按住了鼠标，则不考虑移出的问题。
@@ -132,7 +134,7 @@ function createSideNavVue () {
         if (!this.aftermousedown) return
         var offy = event.offsetY
         this.top = this.top + (offy - this.mousedownpoint)
-        this.top = this.top > this.totalHeight ? this.totalHeight : this.top
+        this.top = this.top >= this.totalHeight ? this.totalHeight - this.height : this.top
         this.top = this.top < 0 ? 0 : this.top
         this.mousedownpoint = offy // hehe 以上的内容需要跟随鼠标的移动来显示对应的位置，所以需要实时监听
         if (this.throttle) {
@@ -147,8 +149,11 @@ function createSideNavVue () {
         this.aftermousedown = false
         this.show = false
         this.zindex = -1
-        this.targetindex = Math.floor(this.starttop / this.height)
-        switchElement(this.startindex, this.targetindex)
+        var that = this
+        setTimeout(function () {  // hehe 这里依赖于mouseover的结果，但是呢mouseover的结果滞后了20ms，所以这里也滞后20ms。我不知道这里有没有一个定式，就是同样延迟这么久，先触发的事件先执行。从结果上来说是这样。
+          that.targetindex = Math.floor(that.starttop / that.height)
+          switchElement(that.startindex, that.targetindex)
+        }, 20)
       },
       notselect: function () {
         return false
