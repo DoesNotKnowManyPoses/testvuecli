@@ -7,7 +7,7 @@ function createLivePanelVue () {
     el: '#module-live',
     components: {MyLiveList, MyLiveTenant},
     data: {
-      heheh:'hehehehehehehehe',
+      heheh: 'hehehehehehehehe',
       livenumber: 10000,
       updatesnum: 12345,
       biglivelists: [{imagesrc: './static/hahaha.jpg', contentsrc: './static/bilibili_recommend3.jpg', host: '葡萄美酒夜光杯', ahreflink: 'http', number: '3333', desc: '不知明镜里，何处得秋霜。', info: '战争·出战'}, {imagesrc: './static/bilibili_recommend2.jpg', contentsrc: './static/movablevideo4.webp', host: '葡萄美酒夜光杯', ahreflink: 'http', number: '3333', desc: '欲渡黄河冰塞川，将登太行雪满山', info: '战争·出战'},
@@ -39,12 +39,15 @@ function createLivePanelVue () {
         {num: 6, livelink: 'http', photosrc: './static/host6.jpg', viewcount: '1.5W', postname: '那一瞥', desc: '那一剑的温柔'}]
     },
     created: function () {
+      this.isselected = [true]
+      for (var i = 0; i < this.descArray.length; i++) {
+        this.isselected.push(false)
+      }
       this.initializeData()
       this.getUpdateLoop()
     },
     methods: {
       initializeData: function () {
-        this.isselected = [true]
         this.carousel = [true]
         this.indexArray = [0]
         this.leftArray = [0]
@@ -56,7 +59,6 @@ function createLivePanelVue () {
         this.widthArray = [specialPercent]
         this.desc = this.descArray[0]
         for (var i = 1; i < part; i++) {
-          this.isselected.push(false)
           this.carousel.push(false)
           this.indexArray.push(i)
           this.leftArray.push(-1 * i * this.width)
