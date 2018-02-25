@@ -2014,7 +2014,8 @@ border: 1px solid #e5e9ef;
     position: relative;
     width:160px;
     height:148px;
-    display: inline-block;
+    float:left;
+    /*如果是display:inline-block；在safari里面会很奇怪。在其他都OK。*/
     overflow: hidden;
     margin-right: 20px;
     margin-bottom: 20px;
@@ -2039,6 +2040,9 @@ border: 1px solid #e5e9ef;
     background-color: black;
     top:0;
     transition:all 1s ease;
+    -moz-transition: all 1s ease; /* Firefox 4 */
+    -webkit-transition: all 1s ease; /* Safari 和 Chrome */
+    -o-transition: all 1s ease; /* Opera */
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;

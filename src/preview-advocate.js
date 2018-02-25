@@ -12,6 +12,30 @@ function createPreviewAdvocateVue () {
         {num: 40, srclink: './static/movablevideo4.webp', imgsrc: './static/movablepic.webp', bulletURL: '', hreflink: '', desc: '吾生也有涯，而知也无涯', duration: '5:20', show: true},
         {num: 40, srclink: './static/movablevideo2.webp', imgsrc: './static/movablepic.webp', bulletURL: '', hreflink: '', desc: '出师未捷身先死，长使英雄泪满襟', duration: '5:20', show: true}],
       advocateContainer: 'advocate-container'
+    },
+    created: function () {
+      var browser = window.navigator.userAgent.toLowerCase()
+      var isSafari = browser.indexOf('chrome') < 0 && browser.indexOf('safari') >= 0
+      var isEdge = browser.indexOf('edge') >= 0
+      var isFireFox = browser.indexOf('firefox')>=0
+      var isIE = browser.indexOf('chrome') < 0 && browser.indexOf('safari') < 0 && browser.indexOf('firefox') < 0 || browser.indexOf('msie') >= 0
+      if (isSafari || isEdge || isFireFox || isIE) {
+        console.log('webp not supported')
+        this.changePicType()
+      }
+    },
+    methods: {
+      changePicType: function () {
+        for (let video of this.videoList) {
+          video.srclink = this.changeToJPG(video.srclink)
+          video.imgsrc = this.changeToJPG(video.imgsrc)
+        }
+      },
+      changeToJPG: function (str) {
+        var arr = str.split('.')
+        arr[arr.length - 1] = 'jpg'
+        return arr.join('.')
+      }
     }
   })
   return previewVue
