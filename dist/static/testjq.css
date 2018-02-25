@@ -1,0 +1,14 @@
+
+.location{
+    position: relative;
+    width:200px;
+    height:200px;
+    border:1px solid lightcoral;
+    margin-bottom:2px;
+}
+.six{
+    background-color: blueviolet;
+}
+.seven{
+    background-color: brown;
+}
